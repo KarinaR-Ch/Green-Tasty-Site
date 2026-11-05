@@ -1,61 +1,47 @@
-# frontend-app
+# Green & Tasty
 
-![Version: 0.1.0](https://img.shields.io/badge/Version-0.1.0-informational?style=flat-square) ![Type: application](https://img.shields.io/badge/Type-application-informational?style=flat-square) ![AppVersion: 0.1.0](https://img.shields.io/badge/AppVersion-0.1.0-informational?style=flat-square)
+Green & Tasty is a standalone, responsive restaurant landing page. The markup,
+styles, JavaScript, and images are all contained in `index.html`; no package
+manager, build step, or external assets are required.
 
-A Helm chart for Kubernetes
+## Run locally
 
-**Homepage:** <https://github.com/KubeRocketCI/template-javascript-empty.git>
+Open `index.html` in a browser.
 
-## Maintainers
+## Demo account
 
-| Name     | Email | Url |
-| -------- | ----- | --- |
-| DEV Team |       |     |
+The sign-up and sign-in forms are a browser-only demo. New accounts are saved
+in the browser's local storage with a salted PBKDF2 password hash, and sign-in
+is checked locally. There is no backend authentication; do not use real
+passwords or sensitive information. Clearing browser data removes saved demo
+accounts. A signed-in state lasts only until the page is reloaded.
 
-## Source Code
+## Table booking
 
-- <https://github.com/KubeRocketCI/template-javascript-empty.git>
+The booking form is a browser-only demo. It accepts dates from today through
+the next 20 days and half-hour reservations during service hours. With the
+default 1.5-hour stay, bookable start times run from 10:00 through 20:00, with
+elapsed times for today unavailable. Future slots start available and a
+confirmed booking blocks overlapping times at that location in the current
+browser. There is no backend, so bookings are not synchronized between
+browsers or sent to the restaurant.
 
-## Values
+## Shopping cart
 
-| Key                                        | Type   | Default                                      | Description                                                                                                            |
-| ------------------------------------------ | ------ | -------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| affinity                                   | object | `{}`                                         | https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#affinity-and-anti-affinity                    |
-| autoscaling.enabled                        | bool   | `false`                                      |                                                                                                                        |
-| autoscaling.maxReplicas                    | int    | `100`                                        |                                                                                                                        |
-| autoscaling.minReplicas                    | int    | `1`                                          |                                                                                                                        |
-| autoscaling.targetCPUUtilizationPercentage | int    | `80`                                         |                                                                                                                        |
-| fullnameOverride                           | string | `""`                                         |                                                                                                                        |
-| image.digest                               | string | `""`                                         | Image digest for immutable reference (e.g., sha256:abc123...). If set, deployed as :tag@digest.                        |
-| image.pullPolicy                           | string | `"IfNotPresent"`                             |                                                                                                                        |
-| image.repository                           | string | `"frontend-app"`                             |                                                                                                                        |
-| image.tag                                  | string | `""`                                         | Overrides the image tag whose default is the chart appVersion.                                                         |
-| imagePullSecrets[0].name                   | string | `"regcred"`                                  |                                                                                                                        |
-| ingress.annotations                        | object | `{}`                                         |                                                                                                                        |
-| ingress.className                          | string | `""`                                         |                                                                                                                        |
-| ingress.dnsWildcard                        | string | `"development.krci-dev.cloudmentor.academy"` |                                                                                                                        |
-| ingress.enabled                            | bool   | `true`                                       |                                                                                                                        |
-| ingress.hosts[0].host                      | string | `"edpDefault"`                               |                                                                                                                        |
-| ingress.hosts[0].paths[0].path             | string | `"/"`                                        |                                                                                                                        |
-| ingress.hosts[0].paths[0].pathType         | string | `"ImplementationSpecific"`                   |                                                                                                                        |
-| ingress.tls                                | list   | `[]`                                         |                                                                                                                        |
-| livenessProbe.tcpSocket.port               | string | `"http"`                                     |                                                                                                                        |
-| nameOverride                               | string | `""`                                         |                                                                                                                        |
-| nodeSelector                               | object | `{}`                                         | https://kubernetes.io/docs/concepts/scheduling-eviction/assign-pod-node/#nodeselector                                  |
-| podAnnotations                             | object | `{}`                                         |                                                                                                                        |
-| podLabels                                  | object | `{}`                                         |                                                                                                                        |
-| podSecurityContext                         | object | `{}`                                         |                                                                                                                        |
-| readinessProbe.initialDelaySeconds         | int    | `20`                                         |                                                                                                                        |
-| readinessProbe.tcpSocket.port              | string | `"http"`                                     |                                                                                                                        |
-| replicaCount                               | int    | `1`                                          |                                                                                                                        |
-| resources                                  | object | `{}`                                         |                                                                                                                        |
-| securityContext                            | object | `{}`                                         |                                                                                                                        |
-| service.port                               | int    | `8080`                                       |                                                                                                                        |
-| service.type                               | string | `"ClusterIP"`                                |                                                                                                                        |
-| serviceAccount.annotations                 | object | `{}`                                         | Annotations to add to the service account                                                                              |
-| serviceAccount.automount                   | bool   | `true`                                       | Automatically mount a ServiceAccount's API credentials?                                                                |
-| serviceAccount.create                      | bool   | `true`                                       | Specifies whether a service account should be created                                                                  |
-| serviceAccount.name                        | string | `""`                                         | The name of the service account to use. If not set and create is true, a name is generated using the fullname template |
-| tolerations                                | list   | `[]`                                         | https://kubernetes.io/docs/concepts/scheduling-eviction/taint-and-toleration/                                          |
-| volumeMounts                               | list   | `[]`                                         |                                                                                                                        |
-| volumes                                    | list   | `[]`                                         |                                                                                                                        |
+The shopping cart is available after signing in and is kept in memory for the
+current page session. Pre-orders can be added to a reservation from its
+confirmation dialog or invitation link. Invitation links contain the reservation
+and pre-order details in the URL fragment; this data is readable by anyone who
+has the link and is not encrypted. Orders and checkout are not connected to a
+restaurant.
+
+## Build the container
+
+Build the Docker image from the project root:
+
+```sh
+docker build -t green-and-tasty .
+```
+
+The Nginx container serves the root `index.html` on port `8080`. Kubernetes
+deployment templates are in `deploy-templates/`.
