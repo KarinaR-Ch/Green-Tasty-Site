@@ -49,13 +49,5 @@ and USD/UAH. UAH prices use a clearly labelled, illustrative rate of
 1 USD = 40 UAH; this is not a live exchange rate. Prices remain stored in USD
 and are converted only for display.
 
-## Build the container
-
-Build the Docker image from the project root:
-
-```sh
-docker build -t green-and-tasty .
-```
-
 The Nginx container serves the root `index.html` on port `8080`. Kubernetes
 deployment templates are in `deploy-templates/`.
