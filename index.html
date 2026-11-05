@@ -193,6 +193,52 @@
         gap: 12px;
       }
 
+      .header-settings {
+        display: flex;
+        flex: 0 0 auto;
+        align-items: center;
+        gap: 7px;
+      }
+
+      .currency-demo-rate {
+        color: #777d74;
+        font-size: 9px;
+        white-space: nowrap;
+      }
+
+      .header-setting-group {
+        display: inline-flex;
+        align-items: center;
+        padding: 3px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--white);
+      }
+
+      .header-setting-button {
+        min-width: 39px;
+        min-height: 30px;
+        padding: 0 8px;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: #555b53;
+        font: inherit;
+        font-size: 11px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .header-setting-button[aria-pressed="true"] {
+        background: var(--green);
+        color: var(--white);
+      }
+
+      .header-setting-button:hover:not([aria-pressed="true"]) {
+        background: #eff8ef;
+        color: var(--green-dark);
+      }
+
       .account-actions[hidden] {
         display: none;
       }
@@ -1416,6 +1462,31 @@
         margin: 4px 0;
         color: #4e554c;
         font-size: 12px;
+      }
+
+      .reservation-saved-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 12px;
+      }
+
+      .reservation-saved-actions .button {
+        min-height: 36px;
+        padding-inline: 14px;
+        font-size: 11px;
+      }
+
+      .reservation-cancel-button {
+        border-color: #b83c32;
+        background: var(--white);
+        color: #a33131;
+      }
+
+      .reservation-cancel-button:hover {
+        border-color: #a33131;
+        background: #a33131;
+        color: var(--white);
       }
 
       .reservation-list-actions {
@@ -2777,6 +2848,7 @@
         .header-inner {
           min-height: 72px;
           gap: 10px;
+          flex-wrap: wrap;
         }
 
         .brand {
@@ -2800,6 +2872,25 @@
 
         .account-actions {
           gap: 7px;
+        }
+
+        .header-settings {
+          order: 5;
+          flex-basis: 100%;
+          justify-content: flex-end;
+          gap: 5px;
+          padding-bottom: 8px;
+        }
+
+        .site-nav {
+          order: 4;
+        }
+
+        .header-setting-button {
+          min-width: 34px;
+          min-height: 28px;
+          padding-inline: 6px;
+          font-size: 10px;
         }
 
         .header-icon-link,
@@ -3288,6 +3379,47 @@
             </div>
           </div>
         </div>
+        <div class="header-settings" aria-label="Language and currency settings">
+          <div class="header-setting-group" role="group" aria-label="Language">
+            <button
+              class="header-setting-button"
+              type="button"
+              data-language="en"
+              aria-pressed="true"
+            >
+              EN
+            </button>
+            <button
+              class="header-setting-button"
+              type="button"
+              data-language="uk"
+              aria-pressed="false"
+            >
+              UA
+            </button>
+          </div>
+          <div class="header-setting-group" role="group" aria-label="Currency">
+            <button
+              class="header-setting-button"
+              type="button"
+              data-currency="USD"
+              aria-pressed="true"
+              title="Prices are converted at an estimated demo rate"
+            >
+              USD
+            </button>
+            <button
+              class="header-setting-button"
+              type="button"
+              data-currency="UAH"
+              aria-pressed="false"
+              title="Prices are converted at an estimated demo rate"
+            >
+              UAH
+            </button>
+          </div>
+          <small class="currency-demo-rate">Demo rate: $1 = ₴40</small>
+        </div>
       </div>
     </header>
 
@@ -3698,6 +3830,10 @@
           </button>
         </div>
         <form class="reservation-edit-form">
+          <div class="booking-field">
+            <label for="reservation-edit-date">Date</label>
+            <input id="reservation-edit-date" type="date" required />
+          </div>
           <div class="booking-inline-fields">
             <div class="booking-field">
               <label for="reservation-edit-time">Time</label>
@@ -3961,6 +4097,22 @@
                 stroke-width="1.7"
               />
             </svg>
+          </button>
+        </div>
+        <div class="reservation-saved-actions" data-owner-reservation-actions hidden>
+          <button
+            class="button reservation-button-light"
+            type="button"
+            data-owner-edit-reservation
+          >
+            Change Reservation
+          </button>
+          <button
+            class="button reservation-cancel-button"
+            type="button"
+            data-owner-cancel-reservation
+          >
+            Cancel Reservation
           </button>
         </div>
         <button
@@ -4571,6 +4723,9 @@
       const reservationEditTime = document.querySelector(
         "#reservation-edit-time",
       );
+      const reservationEditDate = document.querySelector(
+        "#reservation-edit-date",
+      );
       const reservationEditGuests = document.querySelector(
         "#reservation-edit-guests",
       );
@@ -4585,6 +4740,9 @@
       );
       const reservationInviteName = document.querySelector(
         "#reservation-invite-name",
+      );
+      const ownerReservationActions = reservationInviteDialog.querySelector(
+        "[data-owner-reservation-actions]",
       );
       const preorderDialog = document.querySelector("#preorder-dialog");
       const preorderSuccessDialog = document.querySelector(
@@ -4624,6 +4782,142 @@
       let preorderMode;
       let savedReservations = [];
       let reservationStorageError = false;
+      let ownerEditingReservationId = null;
+      let currentLanguage = "en";
+      let currentCurrency = "USD";
+      const currencyDemoRate = 40;
+      const languageStorageKey = "green-tasty-language";
+      const currencyStorageKey = "green-tasty-currency";
+      const languageButtons = [
+        ...document.querySelectorAll("[data-language]"),
+      ];
+      const currencyButtons = [
+        ...document.querySelectorAll("[data-currency]"),
+      ];
+      const originalTextNodes = new WeakMap();
+      const ukrainianTranslations = {
+        "Our story": "Наша історія",
+        "Our Menu": "Наше меню",
+        Locations: "Локації",
+        "Book a table": "Забронювати столик",
+        Reservations: "Бронювання",
+        Contact: "Контакти",
+        "Sign In": "Увійти",
+        "Sign in to Your Account": "Увійдіть у свій акаунт",
+        "Sign in to add to your cart": "Увійдіть, щоб додати страву до кошика",
+        "Create an Account": "Створити акаунт",
+        "Most Popular Dishes": "Найпопулярніші страви",
+        "Our Locations": "Наші локації",
+        "Get in Touch": "Зв'яжіться з нами",
+        "Good food.": "Смачна їжа.",
+        "Good feeling.": "Гарний настрій.",
+        "Fresh, local, and full of life": "Свіже, місцеве та сповнене життя",
+        "A Tbilisi restaurant family celebrating fresh ingredients, thoughtful cooking, and the generous spirit of Georgian food.":
+          "Сім'я ресторанів у Тбілісі, де цінують свіжі продукти, продумане приготування та щедру грузинську гостинність.",
+        "Get to know us": "Познайомтеся з нами",
+        "A little about us": "Трохи про нас",
+        "Rooted in good things.": "З любов'ю до справжнього.",
+        "What matters to us": "Наші цінності",
+        "Fresh by nature": "Природна свіжість",
+        "Locally sourced ingredients bring the best of every season.":
+          "Місцеві продукти дарують найкраще в кожному сезоні.",
+        "Good for everyone": "Добре для кожного",
+        "Vegetarian and vegan choices are always part of the table.":
+          "У меню завжди є вегетаріанські та веганські страви.",
+        "Made to be shared": "Створено для спільних моментів",
+        "Honest food, warm hospitality, and room for one more.":
+          "Щира їжа, тепла гостинність і місце ще для одного гостя.",
+        "Seasonal bowls • Vegan friendly": "Сезонні страви • Веганські опції",
+        "Fresh, vibrant bowls made with seasonal ingredients and plenty of plant-powered flavour.":
+          "Яскраві свіжі страви із сезонних інгредієнтів і рослинних продуктів.",
+        "Good ingredients make all the difference.":
+          "Якісні інгредієнти мають значення.",
+        "Meet us in Tbilisi.": "Зустріньтеся з нами в Тбілісі.",
+        "Customer Reviews": "Відгуки гостей",
+        "Reservation details": "Деталі бронювання",
+        "Pre-order": "Передзамовлення",
+        "Your Cart": "Ваш кошик",
+        "Add to Cart": "Додати до кошика",
+        "Book a Table": "Забронювати столик",
+        Email: "Електронна пошта",
+        Password: "Пароль",
+        "First Name": "Ім'я",
+        "Last Name": "Прізвище",
+        "Confirm New Password": "Підтвердьте новий пароль",
+        "Not now": "Не зараз",
+        "Check Availability": "Перевірити наявність",
+        "Submit Pre-Order": "Надіслати передзамовлення",
+        "Pre-Order Submitted!": "Передзамовлення надіслано!",
+        "Your items": "Ваші страви",
+        "Create New Pre-Order": "Створити нове передзамовлення",
+        "Expected ready time - 10 minutes": "Орієнтовний час приготування — 10 хвилин",
+        "This reservation could not be updated. Please reopen it and try again.":
+          "Не вдалося змінити бронювання. Відкрийте його знову та спробуйте ще раз.",
+        "Choose a date from today through the next 20 days.":
+          "Оберіть дату від сьогодні до наступних 20 днів.",
+        "Availability could not be verified. Please refresh and try again.":
+          "Не вдалося перевірити наявність. Оновіть сторінку та спробуйте ще раз.",
+        "That time is no longer available. Please choose another.":
+          "Цей час більше недоступний. Оберіть інший.",
+        "No other times are available for this party size.":
+          "Для цієї кількості гостей інших вільних годин немає.",
+        "Reservation changes saved.": "Зміни бронювання збережено.",
+        "Reservations can only be cancelled at least 30 minutes before the start time.":
+          "Скасувати бронювання можна не пізніше ніж за 30 хвилин до візиту.",
+        "Your reservation could not be updated. Please try again.":
+          "Не вдалося оновити бронювання. Спробуйте ще раз.",
+        "The reservation could not be cancelled. Please try again.":
+          "Не вдалося скасувати бронювання. Спробуйте ще раз.",
+        "Reservation link copied.": "Посилання на бронювання скопійовано.",
+        "Could not copy automatically. Select and copy the link above.":
+          "Не вдалося скопіювати автоматично. Виділіть і скопіюйте посилання вище.",
+        "Your cart is empty.": "Ваш кошик порожній.",
+        Remove: "Видалити",
+        "Checkout is not available in this demo. Please contact the restaurant to place an order.":
+          "Оплата недоступна в демоверсії. Щоб зробити замовлення, зв'яжіться з рестораном.",
+        "Book Your Table": "Забронюйте столик",
+        Location: "Локація",
+        Date: "Дата",
+        Time: "Час",
+        "Guests (max. 4)": "Гості (до 4)",
+        "Find a Table": "Знайти столик",
+        "Show All Times": "Показати всі години",
+        "Review & Confirm Reservation": "Перевірте та підтвердьте бронювання",
+        "You can cancel up to 30 minutes before your reservation.":
+          "Ви можете скасувати бронювання не пізніше ніж за 30 хвилин до візиту.",
+        Edit: "Змінити",
+        Confirm: "Підтвердити",
+        "Edit Reservation": "Змінити бронювання",
+        "How long would you like to stay?": "Тривалість візиту",
+        "Need more time or want to make changes? Please contact the restaurant directly.":
+          "Щоб змінити тривалість або отримати допомогу, зверніться безпосередньо до ресторану.",
+        "Save Changes": "Зберегти зміни",
+        "Reservation Confirmed": "Бронювання підтверджено",
+        "Invite Link": "Посилання-запрошення",
+        "View Reservation": "Переглянути бронювання",
+        "Make Pre-Order": "Зробити передзамовлення",
+        "Your Reservations": "Ваші бронювання",
+        "You do not have any confirmed reservations yet.":
+          "У вас ще немає підтверджених бронювань.",
+        "Change Reservation": "Змінити бронювання",
+        "Cancel Reservation": "Скасувати бронювання",
+        "Browse Menu": "Переглянути меню",
+        Cancel: "Скасувати",
+        "Your Order": "Ваше замовлення",
+        "Submit Pre-Order": "Надіслати передзамовлення",
+        "Account successfully created": "Акаунт успішно створено",
+        "Enter Your Name": "Введіть ваше ім'я",
+        "You’re Invited!": "Вас запрошено!",
+        "No Tables Available": "Вільних столиків немає",
+        "Try adjusting your date, time, or number of guests to find available tables.":
+          "Змініть дату, час або кількість гостей, щоб знайти вільні столики.",
+        "No tables match your selected date, time, and party size.":
+          "На вибрані дату, час і кількість гостей столиків немає.",
+        "Try Again": "Спробувати ще раз",
+        "Demo rate: $1 = ₴40": "Демо-курс: $1 = ₴40",
+        "Prices are converted at an estimated demo rate":
+          "Ціни перераховано за орієнтовним демонстраційним курсом",
+      };
       const preorderSelection = new Map();
       const cartItems = [];
 
@@ -4786,6 +5080,125 @@
         addDishQuantityToCart(index, 1);
       }
 
+      document.querySelectorAll(".dish-card").forEach((card) => {
+        const priceNode = card.querySelector(".dish-price").childNodes[0];
+        const priceUsd = Number.parseFloat(
+          priceNode.textContent.replace(/[^\d.]/g, ""),
+        );
+        if (Number.isFinite(priceUsd)) {
+          card.dataset.priceUsd = String(priceUsd);
+        }
+      });
+
+      function formatMoney(amountUsd) {
+        const currencyAmount =
+          currentCurrency === "UAH" ? amountUsd * currencyDemoRate : amountUsd;
+        return new Intl.NumberFormat(
+          currentCurrency === "UAH" ? "uk-UA" : "en-US",
+          {
+            style: "currency",
+            currency: currentCurrency,
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2,
+          },
+        ).format(currencyAmount);
+      }
+
+      function applyLanguage() {
+        document.documentElement.lang = currentLanguage === "uk" ? "uk" : "en";
+        const walker = document.createTreeWalker(
+          document.body,
+          NodeFilter.SHOW_TEXT,
+        );
+        let textNode;
+        while ((textNode = walker.nextNode())) {
+          if (
+            !textNode.parentElement?.closest("script, style, .dish-price")
+          ) {
+            const original =
+              originalTextNodes.get(textNode) ?? textNode.nodeValue;
+            originalTextNodes.set(textNode, original);
+            const key = original.trim();
+            const translation = ukrainianTranslations[key];
+            const replacement =
+              currentLanguage === "uk" && translation ? translation : original;
+            if (replacement !== textNode.nodeValue) {
+              const leading = original.match(/^\s*/)?.[0] || "";
+              const trailing = original.match(/\s*$/)?.[0] || "";
+              textNode.nodeValue = `${leading}${replacement.trim()}${trailing}`;
+            }
+          }
+        }
+        languageButtons.forEach((button) => {
+          button.setAttribute(
+            "aria-pressed",
+            String(button.dataset.language === currentLanguage),
+          );
+        });
+      }
+
+      function setLanguage(language) {
+        currentLanguage = language;
+        try {
+          localStorage.setItem(languageStorageKey, language);
+        } catch (error) {
+          console.error("Could not save the selected language.", error);
+        }
+        applyLanguage();
+      }
+
+      function setCurrency(currency) {
+        currentCurrency = currency;
+        try {
+          localStorage.setItem(currencyStorageKey, currency);
+        } catch (error) {
+          console.error("Could not save the selected currency.", error);
+        }
+        currencyButtons.forEach((button) => {
+          button.setAttribute(
+            "aria-pressed",
+            String(button.dataset.currency === currentCurrency),
+          );
+        });
+        renderDishPrices();
+        renderCart();
+        if (preorderDialog.open) renderPreorderMenu();
+        if (preorderSuccessDialog.open) {
+          const reservation =
+            preorderMode === "owner" ? currentReservation : sharedReservation;
+          if (reservation) showPreorderConfirmation(reservation);
+        }
+        if (sharedReservation && !sharedReservationPage.hidden) {
+          showSharedReservationPage(sharedReservation, { historyMode: "none" });
+        }
+      }
+
+      languageButtons.forEach((button) => {
+        button.addEventListener("click", () =>
+          setLanguage(button.dataset.language),
+        );
+      });
+
+      currencyButtons.forEach((button) => {
+        button.addEventListener("click", () =>
+          setCurrency(button.dataset.currency),
+        );
+      });
+
+      function renderDishPrices() {
+        document.querySelectorAll(".dish-card").forEach((card) => {
+          const priceUsd = Number(card.dataset.priceUsd);
+          if (!Number.isFinite(priceUsd)) return;
+          card.querySelector(".dish-price").childNodes[0].textContent =
+            formatMoney(priceUsd);
+        });
+        if (activeDishCard && dishDialog.open) {
+          dishDialogPrice.firstChild.textContent = formatMoney(
+            Number(activeDishCard.dataset.priceUsd),
+          );
+        }
+      }
+
       function getDishCatalogItem(index) {
         const card = document.querySelector(
           `.dish-card[data-dish-index="${index}"]`,
@@ -4793,10 +5206,9 @@
         if (!card) return null;
 
         const name = card.querySelector(".dish-info h3").textContent.trim();
-        const priceText = card
-          .querySelector(".dish-price")
-          .childNodes[0].textContent.trim();
-        const price = Number.parseFloat(priceText.replace(/[^\d.]/g, ""));
+        const price = Number(card.dataset.priceUsd);
+        if (!Number.isFinite(price)) return null;
+        const priceText = formatMoney(price);
         return {
           index,
           name,
@@ -4848,8 +5260,8 @@
             name.textContent = item.name;
             const price = document.createElement("p");
             price.textContent =
-              `${item.quantity} × ${item.priceText} = ` +
-              `$${(item.quantity * item.price).toFixed(2)}`;
+              `${item.quantity} × ${formatMoney(item.price)} = ` +
+              `${formatMoney(item.quantity * item.price)}`;
             details.append(name, price);
             const remove = document.createElement("button");
             remove.className = "cart-item-remove";
@@ -4865,9 +5277,10 @@
           (sum, item) => sum + item.price * item.quantity,
           0,
         );
-        cartTotalElement.textContent = `$${total.toFixed(2)}`;
+        cartTotalElement.textContent = formatMoney(total);
         cartTotalRow.hidden = itemCount === 0;
         cartCheckoutButton.disabled = itemCount === 0;
+        applyLanguage();
       }
 
       cartTrigger.addEventListener("click", () => {
@@ -4957,7 +5370,7 @@
         const details = dishDetails[index];
         const image = card.querySelector(".dish-image img");
         const title = card.querySelector(".dish-info h3").textContent.trim();
-        const price = card.querySelector(".dish-price").childNodes[0].textContent.trim();
+        const price = formatMoney(Number(card.dataset.priceUsd));
         const weight = card.querySelector(".dish-weight").textContent.trim();
         if (!details || !image) return;
 
@@ -4976,6 +5389,7 @@
           }),
         );
         dishDialog.showModal();
+        applyLanguage();
         dishDialog
           .querySelector(".dish-dialog-close")
           .focus({ preventScroll: true });
@@ -5049,9 +5463,22 @@
       reservationEditForm.addEventListener("submit", (event) => {
         event.preventDefault();
         if (!activeReservation) return;
+        const selectedDate = reservationEditDate.value;
         const selectedTime = reservationEditTime.value;
         const guests = Number(reservationEditGuestCount.textContent);
         const duration = Number(reservationEditDuration.value);
+        const dateRange = getBookingDateRange();
+        if (
+          !selectedDate ||
+          selectedDate < dateRange.min ||
+          selectedDate > dateRange.max
+        ) {
+          reservationFlowDialog.querySelector(
+            ".reservation-edit-error",
+          ).textContent =
+            "Choose a date from today through the next 20 days.";
+          return;
+        }
         const location = getBookingLocations().find(
           (item) => item.name === activeReservation.location,
         );
@@ -5061,10 +5488,11 @@
             Boolean(location) &&
             isDemoSlotAvailable(
               location,
-              activeReservation.date,
+              selectedDate,
               selectedTime,
               guests,
               duration,
+              ownerEditingReservationId,
             );
         } catch (error) {
           console.error("Could not verify the edited reservation time.", error);
@@ -5080,9 +5508,15 @@
           ).textContent = "That time is no longer available. Please choose another.";
           return;
         }
+        activeReservation.date = selectedDate;
         activeReservation.time = selectedTime;
         activeReservation.guests = guests;
         activeReservation.duration = duration;
+        if (ownerEditingReservationId) {
+          saveEditedReservation();
+          return;
+        }
+        updateReservationSummary();
         requestReservationConfirmation();
       });
       reservationEditDecrease.addEventListener("click", () => {
@@ -5099,6 +5533,12 @@
       });
       reservationEditDuration.addEventListener("change", () => {
         updateReservationEditTimes(reservationEditTime.value);
+      });
+      reservationEditDate.addEventListener("change", () => {
+        updateReservationEditTimes(reservationEditTime.value);
+        reservationFlowDialog.querySelector(
+          ".reservation-edit-error",
+        ).textContent = "";
       });
       reservationEditTime.addEventListener("change", () => {
         reservationFlowDialog.querySelector(
@@ -5120,6 +5560,18 @@
           reservationFlowDialog.close();
           openPreorderMenu("owner");
         });
+      ownerReservationActions
+        .querySelector("[data-owner-edit-reservation]")
+        .addEventListener("click", () => {
+          if (!currentReservation) return;
+          ownerEditingReservationId = currentReservation.id;
+          reservationInviteDialog.close();
+          openReservationEditor();
+          reservationFlowDialog.showModal();
+        });
+      ownerReservationActions
+        .querySelector("[data-owner-cancel-reservation]")
+        .addEventListener("click", () => cancelCurrentReservation());
       reservationInviteDialog
         .querySelector(".reservation-invite-close")
         .addEventListener("click", () => reservationInviteDialog.close());
@@ -5281,12 +5733,13 @@
           `;
           const price = document.createElement("p");
           price.className = "preorder-item-price";
-          price.textContent = `$${(dish.price * quantity || dish.price).toFixed(2)}`;
+          price.textContent = formatMoney(dish.price * quantity || dish.price);
           row.append(image, info, price, remove);
           preorderItemsElement.append(row);
         }
-        preorderTotalElement.textContent = `$${selectedTotal.toFixed(2)}`;
+        preorderTotalElement.textContent = formatMoney(selectedTotal);
         preorderSaveButton.disabled = selectedCount === 0;
+        applyLanguage();
       }
 
       function savePreorderSelection() {
@@ -5385,7 +5838,7 @@
                     ...item,
                     index: -1,
                     image: "",
-                    priceText: `$${item.price.toFixed(2)}`,
+                    priceText: formatMoney(item.price),
                   };
             }),
           );
@@ -5439,14 +5892,15 @@
           name.textContent = `${item.name} × ${item.quantity}`;
           const price = document.createElement("span");
           const itemTotal = item.price * item.quantity;
-          price.textContent = `$${itemTotal.toFixed(2)}`;
+          price.textContent = formatMoney(itemTotal);
           total += itemTotal;
           row.append(name, price);
           preorderConfirmationItems.append(row);
         });
-        preorderConfirmationTotal.textContent = `$${total.toFixed(2)}`;
+        preorderConfirmationTotal.textContent = formatMoney(total);
         preorderDialog.close();
         preorderSuccessDialog.showModal();
+        applyLanguage();
       }
 
       function getLocalDateString(date) {
@@ -5562,13 +6016,30 @@
         });
       }
 
-      function isDemoSlotAvailable(location, date, time, guests, duration = 1.5) {
+      function isDemoSlotAvailable(
+        location,
+        date,
+        time,
+        guests,
+        duration = 1.5,
+        excludeReservationId = null,
+      ) {
         if (guests > location.capacity) return false;
         const [hour, minute] = time.split(":").map(Number);
         const startMinutes = hour * 60 + minute;
         const endMinutes = startMinutes + duration * 60;
         if (endMinutes > 1290) return false;
+        const { min: today } = getBookingDateRange();
+        if (date === today) {
+          const now = new Date();
+          if (startMinutes <= now.getHours() * 60 + now.getMinutes()) {
+            return false;
+          }
+        }
         return !getConfirmedReservationsForAvailability().some((reservation) => {
+          if (excludeReservationId && reservation.id === excludeReservationId) {
+            return false;
+          }
           if (
             reservation.location !== location.name ||
             reservation.date !== date ||
@@ -5604,7 +6075,7 @@
         const timeFilter = bookingTime.value;
         const guests = Number(bookingGuests.textContent);
         const dateLabel = new Date(`${date}T00:00:00`).toLocaleDateString(
-          "en-US",
+          currentLanguage === "uk" ? "uk-UA" : "en-US",
           { month: "short", day: "numeric", year: "numeric" },
         );
         const allTimes = [...bookingTime.options]
@@ -5670,6 +6141,7 @@
           }
           bookingMessage.textContent =
             "No tables match your selected date, time, and party size.";
+          applyLanguage();
           return;
         }
 
@@ -5726,6 +6198,7 @@
         bookingMessage.textContent = timeFilter
           ? `Tables are available at ${matches.map((location) => location.name).join(", ")} at ${timeFilter}.`
           : "Available tables are shown on the right. Select a time to continue.";
+        applyLanguage();
       }
 
       function setReservationStep(step) {
@@ -5741,11 +6214,14 @@
       }
 
       function formatReservationDate(date) {
-        return new Date(`${date}T00:00:00`).toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        });
+        return new Date(`${date}T00:00:00`).toLocaleDateString(
+          currentLanguage === "uk" ? "uk-UA" : "en-US",
+          {
+            month: "short",
+            day: "numeric",
+            year: "numeric",
+          },
+        );
       }
 
       function updateReservationSummary() {
@@ -5764,6 +6240,7 @@
       }
 
       function openReservationReview(location, time) {
+        ownerEditingReservationId = null;
         const dateRange = getBookingDateRange();
         if (
           !bookingDate.value ||
@@ -5822,6 +6299,7 @@
         updateReservationSummary();
         setReservationStep("review");
         reservationFlowDialog.showModal();
+        applyLanguage();
       }
 
       function setReservationEditGuestCount(count) {
@@ -5839,20 +6317,25 @@
         if (!location) return;
         const guests = Number(reservationEditGuestCount.textContent);
         const duration = Number(reservationEditDuration.value);
-        const options = [...bookingTime.options]
-          .filter(
-            (option) =>
-              option.value &&
-              !option.disabled &&
-              isDemoSlotAvailable(
-                location,
-                activeReservation.date,
-                option.value,
-                guests,
-                duration,
-              ),
-          )
-          .map((option) => new Option(option.textContent, option.value));
+        const date = reservationEditDate.value || activeReservation.date;
+        const options = [];
+        for (let minutes = 600; minutes <= 1290; minutes += 30) {
+          const hour = Math.floor(minutes / 60);
+          const minute = minutes % 60;
+          const time = `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`;
+          if (
+            isDemoSlotAvailable(
+              location,
+              date,
+              time,
+              guests,
+              duration,
+              ownerEditingReservationId,
+            )
+          ) {
+            options.push(new Option(time, time));
+          }
+        }
         reservationEditTime.replaceChildren(...options);
         if (options.some((option) => option.value === preferredTime)) {
           reservationEditTime.value = preferredTime;
@@ -5870,6 +6353,10 @@
         subtitle.textContent =
           `${activeReservation.location} · Table ${activeReservation.table} · ` +
           formatReservationDate(activeReservation.date);
+        const dateRange = getBookingDateRange();
+        reservationEditDate.min = dateRange.min;
+        reservationEditDate.max = dateRange.max;
+        reservationEditDate.value = activeReservation.date;
         setReservationEditGuestCount(activeReservation.guests);
         reservationEditDuration.value = String(activeReservation.duration);
         updateReservationEditTimes(activeReservation.time);
@@ -5881,6 +6368,141 @@
           reservationFlowDialog.querySelector(
             ".reservation-edit-error",
           ).textContent = "No other times are available for this party size.";
+        }
+      }
+
+      function saveEditedReservation() {
+        if (!activeReservation || !currentAccount || !ownerEditingReservationId) {
+          reservationFlowDialog.querySelector(
+            ".reservation-edit-error",
+          ).textContent =
+            "This reservation could not be updated. Please reopen it and try again.";
+          return;
+        }
+        try {
+          const allReservations = JSON.parse(
+            localStorage.getItem(reservationStorageKey) || "{}",
+          );
+          if (
+            !allReservations ||
+            typeof allReservations !== "object" ||
+            Array.isArray(allReservations)
+          ) {
+            throw new Error("Stored reservation data is not an account map.");
+          }
+          const accountReservations = allReservations[currentAccount.email];
+          if (!Array.isArray(accountReservations)) {
+            throw new Error("The reservation could not be found in browser storage.");
+          }
+          const existingIndex = accountReservations.findIndex(
+            (reservation) => reservation.id === ownerEditingReservationId,
+          );
+          if (existingIndex < 0) {
+            throw new Error("The reservation could not be found in browser storage.");
+          }
+
+          const updatedReservation = {
+            ...accountReservations[existingIndex],
+            ...activeReservation,
+            id: ownerEditingReservationId,
+            timeEnd: getReservationEndTime(
+              activeReservation.time,
+              activeReservation.duration,
+            ),
+            updatedAt: new Date().toISOString(),
+          };
+          accountReservations[existingIndex] = updatedReservation;
+          allReservations[currentAccount.email] = accountReservations;
+          localStorage.setItem(
+            reservationStorageKey,
+            JSON.stringify(allReservations),
+          );
+          savedReservations = accountReservations;
+          currentReservation = updatedReservation;
+          activeReservation = { ...updatedReservation };
+          ownerEditingReservationId = null;
+          updateReservationSummary();
+          reservationFlowDialog.querySelector(
+            ".reservation-share-url",
+          ).value = createReservationShareUrl(currentReservation);
+          reservationFlowDialog.querySelector(
+            ".reservation-success-status",
+          ).textContent = "Reservation changes saved.";
+          setReservationStep("success");
+          applyLanguage();
+        } catch (error) {
+          console.error("Could not update saved reservation.", error);
+          reservationFlowDialog.querySelector(
+            ".reservation-edit-error",
+          ).textContent =
+            "Your reservation could not be updated. Please try again.";
+        }
+      }
+
+      function cancelCurrentReservation() {
+        if (!currentAccount || !currentReservation?.id) return;
+        const reservationStart = new Date(
+          `${currentReservation.date}T${currentReservation.time}:00`,
+        );
+        if (
+          !Number.isNaN(reservationStart.getTime()) &&
+          reservationStart.getTime() - Date.now() < 30 * 60 * 1000
+        ) {
+          reservationInviteDialog.querySelector(
+            ".reservation-invite-status",
+          ).textContent =
+            currentLanguage === "uk"
+              ? "Скасувати бронювання можна не пізніше ніж за 30 хвилин до візиту."
+              : "Reservations can only be cancelled at least 30 minutes before the start time.";
+          applyLanguage();
+          return;
+        }
+        const confirmed = window.confirm(
+          currentLanguage === "uk"
+            ? "Скасувати це бронювання? Цю дію неможливо скасувати."
+            : "Cancel this reservation? This action cannot be undone.",
+        );
+        if (!confirmed) return;
+        try {
+          const allReservations = JSON.parse(
+            localStorage.getItem(reservationStorageKey) || "{}",
+          );
+          if (
+            !allReservations ||
+            typeof allReservations !== "object" ||
+            Array.isArray(allReservations)
+          ) {
+            throw new Error("Stored reservation data is not an account map.");
+          }
+          const accountReservations = allReservations[currentAccount.email];
+          if (!Array.isArray(accountReservations)) {
+            throw new Error("The reservation could not be found in browser storage.");
+          }
+          const remainingReservations = accountReservations.filter(
+            (reservation) => reservation.id !== currentReservation.id,
+          );
+          if (remainingReservations.length === accountReservations.length) {
+            throw new Error("The reservation could not be found in browser storage.");
+          }
+          allReservations[currentAccount.email] = remainingReservations;
+          localStorage.setItem(
+            reservationStorageKey,
+            JSON.stringify(allReservations),
+          );
+          savedReservations = remainingReservations;
+          currentReservation = remainingReservations[0] || null;
+          activeReservation = currentReservation
+            ? { ...currentReservation }
+            : null;
+          reservationInviteDialog.close();
+          openReservations();
+        } catch (error) {
+          console.error("Could not cancel saved reservation.", error);
+          reservationInviteDialog.querySelector(
+            ".reservation-invite-status",
+          ).textContent =
+            "The reservation could not be cancelled. Please try again.";
+          applyLanguage();
         }
       }
 
@@ -6123,9 +6745,11 @@
         }
         setReservationStep("list");
         reservationFlowDialog.showModal();
+        applyLanguage();
       }
 
       function openOwnerReservation(reservation) {
+        ownerEditingReservationId = null;
         currentReservation = { ...reservation };
         activeReservation = { ...reservation };
         reservationFlowDialog.close();
@@ -6195,21 +6819,23 @@
           name.textContent = item.name;
           const price = document.createElement("p");
           price.textContent =
-            `${item.quantity} × $${item.price.toFixed(2)} = ` +
-            `$${(item.quantity * item.price).toFixed(2)}`;
+            `${item.quantity} × ${formatMoney(item.price)} = ` +
+            `${formatMoney(item.quantity * item.price)}`;
           total += item.price * item.quantity;
           row.append(name, price);
           cart.append(row);
         });
-        totalElement.textContent = `Total: $${total.toFixed(2)}`;
+        totalElement.textContent = `Total: ${formatMoney(total)}`;
         sharedReservationPage.hidden = false;
         document.body.classList.add("is-showing-shared-reservation");
         if (showInvitation) openReservationInvitation(reservation);
+        applyLanguage();
       }
 
       function openReservationInvitation(reservation, { mode = "guest" } = {}) {
         reservationInviteMode = mode;
         const isGuestInvitation = mode === "guest";
+        ownerReservationActions.hidden = isGuestInvitation;
         const values = {
           inviter: reservation.inviter || "Your host",
           location: reservation.address || reservation.location,
@@ -6251,6 +6877,7 @@
           ".reservation-invite-status",
         ).textContent = "";
         if (!reservationInviteDialog.open) reservationInviteDialog.showModal();
+        applyLanguage();
       }
 
       function decodeReservationToken(token) {
@@ -6424,6 +7051,7 @@
         reviewSort.value = "newest";
         renderLocationReviews(details, reviewSort.value);
         locationDialog.showModal();
+        applyLanguage();
         locationDialog
           .querySelector(".location-dialog-close")
           .focus({ preventScroll: true });
@@ -6464,7 +7092,7 @@
             date.className = "review-date";
             date.dateTime = review.date;
             date.textContent = new Date(`${review.date}T12:00:00`).toLocaleDateString(
-              "en-US",
+              currentLanguage === "uk" ? "uk-UA" : "en-US",
               { month: "short", day: "numeric", year: "numeric" },
             );
 
@@ -6731,6 +7359,7 @@
         registrationMessage.textContent = "";
         if (showRegistration) updateRegistrationForm();
         else updateSignInForm();
+        applyLanguage();
       }
 
       async function createAccount() {
@@ -6993,6 +7622,21 @@
           emailInput.focus();
         }
       });
+
+      try {
+        const savedLanguage = localStorage.getItem(languageStorageKey);
+        const savedCurrency = localStorage.getItem(currencyStorageKey);
+        if (savedLanguage === "en" || savedLanguage === "uk") {
+          currentLanguage = savedLanguage;
+        }
+        if (savedCurrency === "USD" || savedCurrency === "UAH") {
+          currentCurrency = savedCurrency;
+        }
+      } catch (error) {
+        console.error("Could not load saved language or currency settings.", error);
+      }
+      applyLanguage();
+      setCurrency(currentCurrency);
 
       updateSignInForm();
       updateRegistrationForm();
