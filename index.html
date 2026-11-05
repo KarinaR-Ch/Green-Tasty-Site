@@ -1450,6 +1450,10 @@
         padding: clamp(24px, 6vw, 36px);
       }
 
+      .reservation-invite-content [hidden] {
+        display: none;
+      }
+
       .reservation-invite-content h2,
       .preorder-heading h2 {
         margin: 0 0 8px;
@@ -1527,19 +1531,25 @@
       }
 
       .preorder-dialog {
-        width: min(620px, calc(100% - 32px));
+        width: min(480px, calc(100% - 32px));
       }
 
       .preorder-content {
-        padding: 26px;
+        padding: 22px;
+      }
+
+      .preorder-menu-view {
+        display: flex;
+        min-height: min(640px, calc(100vh - 76px));
+        flex-direction: column;
       }
 
       .preorder-heading {
         display: flex;
-        align-items: flex-start;
+        align-items: center;
         justify-content: space-between;
         gap: 16px;
-        margin-bottom: 18px;
+        margin-bottom: 14px;
       }
 
       .preorder-heading p {
@@ -1550,51 +1560,71 @@
 
       .preorder-items {
         display: grid;
-        gap: 12px;
+        max-height: min(440px, calc(100vh - 330px));
+        gap: 8px;
+        overflow-y: auto;
+        padding: 2px 2px 4px;
       }
 
       .preorder-item {
+        position: relative;
         display: grid;
-        grid-template-columns: 68px minmax(0, 1fr) auto;
+        grid-template-columns: 58px minmax(0, 1fr) auto;
         align-items: center;
-        gap: 12px;
-        padding-bottom: 12px;
-        border-bottom: 1px solid var(--line);
+        gap: 10px;
+        min-height: 84px;
+        padding: 9px 10px;
+        border: 1px solid #edf0e9;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgb(26 39 27 / 7%);
       }
 
       .preorder-item img {
-        width: 68px;
-        height: 68px;
-        border-radius: 10px;
+        width: 58px;
+        height: 58px;
+        border-radius: 50%;
         object-fit: cover;
       }
 
+      .preorder-item-info {
+        min-width: 0;
+        padding-right: 22px;
+      }
+
       .preorder-item h3 {
-        margin: 0 0 5px;
-        font-size: 13px;
+        margin: 0 0 4px;
+        font-size: 11px;
+        font-weight: 600;
       }
 
       .preorder-item p {
-        margin: 0;
+        margin: 0 0 7px;
         color: var(--muted);
-        font-size: 12px;
+        font-size: 9px;
       }
 
       .preorder-quantity {
         display: flex;
         align-items: center;
-        gap: 8px;
+        gap: 6px;
       }
 
       .preorder-quantity button {
-        width: 30px;
-        height: 30px;
-        border: 1px solid var(--line);
-        border-radius: 50%;
+        display: grid;
+        width: 22px;
+        height: 22px;
+        place-items: center;
+        border: 1px solid #dfe4dc;
+        border-radius: 6px;
         background: var(--white);
-        color: var(--green-dark);
+        color: #777e74;
         font: inherit;
         cursor: pointer;
+      }
+
+      .preorder-quantity button[data-preorder-quantity="1"] {
+        border-color: var(--green);
+        color: var(--green-dark);
       }
 
       .preorder-quantity button:hover {
@@ -1602,22 +1632,53 @@
       }
 
       .preorder-quantity span {
-        min-width: 16px;
+        min-width: 14px;
         text-align: center;
-        font-size: 12px;
+        font-size: 11px;
+      }
+
+      .preorder-item-price {
+        align-self: end;
+        margin: 0 0 4px !important;
+        color: var(--green-dark) !important;
+        font-size: 11px !important;
+        font-weight: 700;
+        white-space: nowrap;
+      }
+
+      .preorder-item-remove {
+        position: absolute;
+        top: 7px;
+        right: 7px;
+        display: grid;
+        width: 20px;
+        height: 20px;
+        place-items: center;
+        padding: 0;
+        border: 0;
+        background: transparent;
+        color: #50564f;
+        cursor: pointer;
+      }
+
+      .preorder-item-remove svg {
+        width: 15px;
+        height: 15px;
       }
 
       .preorder-footer {
         display: grid;
         gap: 10px;
-        margin-top: 18px;
+        margin-top: auto;
+        padding-top: 14px;
       }
 
       .preorder-total {
+        display: flex;
+        justify-content: space-between;
         margin: 0;
         font-size: 14px;
         font-weight: 700;
-        text-align: right;
       }
 
       .preorder-status {
@@ -1629,8 +1690,137 @@
 
       .preorder-actions {
         display: grid;
-        grid-template-columns: 1fr 1.3fr;
+        grid-template-columns: 1fr 1.5fr;
         gap: 10px;
+      }
+
+      .preorder-actions .button {
+        min-height: 42px;
+        font-size: 11px;
+      }
+
+      .preorder-success-view {
+        position: relative;
+        max-height: min(720px, calc(100vh - 32px));
+        overflow-y: auto;
+        padding: 18px 4px 2px;
+      }
+
+      .preorder-success-close {
+        position: absolute;
+        top: -12px;
+        right: -12px;
+      }
+
+      .preorder-success-check {
+        display: grid;
+        width: 46px;
+        height: 46px;
+        place-items: center;
+        margin: 0 auto 12px;
+        border-radius: 50%;
+        background: var(--green-dark);
+        color: var(--white);
+      }
+
+      .preorder-success-check svg {
+        width: 26px;
+        height: 26px;
+      }
+
+      .preorder-success-view h2 {
+        margin: 0 0 10px;
+        font-size: 22px;
+        letter-spacing: -0.035em;
+        text-align: center;
+      }
+
+      .preorder-success-copy {
+        margin: 0 auto 18px;
+        max-width: 340px;
+        color: var(--muted);
+        font-size: 10px;
+        line-height: 1.55;
+        text-align: center;
+      }
+
+      .preorder-confirmation-details {
+        display: grid;
+        gap: 9px;
+        margin: 0;
+        padding: 14px 0;
+        border-top: 1px solid #edf0e9;
+        border-bottom: 1px solid #edf0e9;
+      }
+
+      .preorder-confirmation-details > div {
+        display: grid;
+        grid-template-columns: 62px minmax(0, 1fr);
+        gap: 10px;
+        font-size: 10px;
+      }
+
+      .preorder-confirmation-details dt {
+        font-weight: 650;
+      }
+
+      .preorder-confirmation-details dd {
+        margin: 0;
+        color: #4e554c;
+      }
+
+      .preorder-confirmation-order {
+        padding-top: 14px;
+      }
+
+      .preorder-confirmation-order h3 {
+        margin: 0 0 9px;
+        font-size: 11px;
+      }
+
+      .preorder-confirmation-item,
+      .preorder-confirmation-total {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin: 0;
+        padding: 5px 0;
+        font-size: 9px;
+      }
+
+      .preorder-confirmation-item span:first-child {
+        color: var(--muted);
+      }
+
+      .preorder-confirmation-total {
+        margin-top: 6px;
+        padding-top: 10px;
+        border-top: 1px solid #edf0e9;
+        font-size: 11px;
+      }
+
+      .preorder-confirmation-total strong:last-child {
+        color: var(--green-dark);
+      }
+
+      .preorder-new-button {
+        width: 100%;
+        min-height: 40px;
+        margin-top: 14px;
+        border: 1px solid #d9ded6;
+        border-radius: 7px;
+        background: var(--white);
+        color: #777e74;
+        font: inherit;
+        font-size: 10px;
+        font-weight: 650;
+        cursor: pointer;
+      }
+
+      .preorder-new-button:hover {
+        border-color: var(--green);
+        color: var(--green-dark);
       }
 
       .preorder-actions button,
@@ -3627,7 +3817,7 @@
       <div class="reservation-invite-content">
         <p class="eyebrow">Green &amp; Tasty</p>
         <h2 id="reservation-invite-title">You&rsquo;re Invited!</h2>
-        <p class="reservation-invite-copy">
+        <p class="reservation-invite-copy" data-invitation-copy>
           <span data-invite-value="inviter">Your host</span> invited you to
           pre-order for an upcoming reservation.
         </p>
@@ -3638,7 +3828,9 @@
           <div><dt>Time</dt><dd data-invite-value="time"></dd></div>
           <div><dt>Guests</dt><dd data-invite-value="guests"></dd></div>
         </dl>
-        <label for="reservation-invite-name">Enter Your Name</label>
+        <label for="reservation-invite-name" data-invitation-name-label>
+          Enter Your Name
+        </label>
         <input
           id="reservation-invite-name"
           type="text"
@@ -3665,15 +3857,58 @@
       aria-labelledby="preorder-title"
     >
       <div class="preorder-content">
-        <div class="preorder-heading">
-          <div>
-            <h2 id="preorder-title">Browse Menu</h2>
-            <p data-preorder-subtitle>Select dishes to add to the reservation.</p>
+        <div class="preorder-menu-view">
+          <div class="preorder-heading">
+            <div>
+              <h2 id="preorder-title">Browse Menu</h2>
+              <p data-preorder-subtitle>Select dishes to add to the reservation.</p>
+            </div>
+            <button
+              class="cart-dialog-close preorder-close"
+              type="button"
+              aria-label="Close pre-order menu"
+            >
+              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                <path
+                  d="m6 6 12 12M18 6 6 18"
+                  stroke="currentColor"
+                  stroke-width="1.8"
+                  stroke-linecap="round"
+                />
+              </svg>
+            </button>
           </div>
+          <div class="preorder-items" id="preorder-items"></div>
+          <div class="preorder-footer">
+            <p class="preorder-status" role="status" aria-live="polite"></p>
+            <p class="preorder-total">
+              <span>Grand Total</span>
+              <span id="preorder-total">$0.00</span>
+            </p>
+            <div class="preorder-actions">
+              <button class="button reservation-button-light preorder-cancel" type="button">
+                Cancel
+              </button>
+              <button class="button preorder-save" type="button" disabled>
+                Submit Pre-Order
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </dialog>
+
+    <dialog
+      class="preorder-dialog preorder-confirmation-dialog"
+      id="preorder-confirmation-dialog"
+      aria-labelledby="preorder-success-title"
+    >
+      <div class="preorder-content">
+        <section class="preorder-success-view" aria-labelledby="preorder-success-title">
           <button
-            class="cart-dialog-close preorder-close"
+            class="cart-dialog-close preorder-success-close"
             type="button"
-            aria-label="Close pre-order menu"
+            aria-label="Close pre-order confirmation"
           >
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path
@@ -3684,18 +3919,36 @@
               />
             </svg>
           </button>
-        </div>
-        <div class="preorder-items" id="preorder-items"></div>
-        <div class="preorder-footer">
-          <p class="preorder-status" role="status" aria-live="polite"></p>
-          <p class="preorder-total" id="preorder-total">Selected total: $0.00</p>
-          <div class="preorder-actions">
-            <button class="button reservation-button-light preorder-cancel" type="button">
-              Cancel
-            </button>
-            <button class="button preorder-save" type="button">Add to Pre-Order</button>
+          <div class="preorder-success-check" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none">
+              <path
+                d="m5 12.5 4.5 4.5L19 7"
+                stroke="currentColor"
+                stroke-width="1.8"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
           </div>
-        </div>
+          <h2 id="preorder-success-title">Pre-Order Submitted!</h2>
+          <p class="preorder-success-copy"></p>
+          <dl class="preorder-confirmation-details">
+            <div><dt>Restaurant</dt><dd>Green &amp; Tasty</dd></div>
+            <div><dt>Location</dt><dd data-preorder-value="location"></dd></div>
+            <div><dt>Date</dt><dd data-preorder-value="date"></dd></div>
+            <div><dt>Time</dt><dd data-preorder-value="time"></dd></div>
+            <div><dt>Guests</dt><dd data-preorder-value="guests"></dd></div>
+          </dl>
+          <div class="preorder-confirmation-order">
+            <h3>Your items</h3>
+            <div id="preorder-confirmation-items"></div>
+            <p class="preorder-confirmation-total">
+              <strong>Total</strong>
+              <strong id="preorder-confirmation-total">$0.00</strong>
+            </p>
+          </div>
+          <button class="preorder-new-button" type="button">Create New Pre-Order</button>
+        </section>
       </div>
     </dialog>
 
@@ -4203,8 +4456,20 @@
         "#reservation-invite-name",
       );
       const preorderDialog = document.querySelector("#preorder-dialog");
+      const preorderSuccessDialog = document.querySelector(
+        "#preorder-confirmation-dialog",
+      );
+      const preorderSuccessView = preorderSuccessDialog.querySelector(
+        ".preorder-success-view",
+      );
       const preorderItemsElement = document.querySelector("#preorder-items");
       const preorderTotalElement = document.querySelector("#preorder-total");
+      const preorderConfirmationItems = document.querySelector(
+        "#preorder-confirmation-items",
+      );
+      const preorderConfirmationTotal = document.querySelector(
+        "#preorder-confirmation-total",
+      );
       const preorderStatus = preorderDialog.querySelector(".preorder-status");
       const preorderSaveButton = preorderDialog.querySelector(".preorder-save");
       const maxFailedAttempts = 5;
@@ -4224,6 +4489,7 @@
       let activeReservation;
       let currentReservation;
       let sharedReservation;
+      let reservationInviteMode = "guest";
       let preorderMode;
       let savedReservations = [];
       let reservationStorageError = false;
@@ -4714,7 +4980,8 @@
       reservationFlowDialog
         .querySelector(".reservation-view-button")
         .addEventListener("click", () => {
-          if (currentReservation) showSharedReservationPage(currentReservation);
+          if (!currentReservation) return;
+          openOwnerReservation(currentReservation);
         });
       reservationFlowDialog
         .querySelector(".reservation-preorder-button")
@@ -4723,6 +4990,7 @@
           openPreorderMenu("owner");
         });
       reservationInviteName.addEventListener("input", () => {
+        if (reservationInviteMode !== "guest") return;
         const hasName = Boolean(reservationInviteName.value.trim());
         document.querySelector("#reservation-invite-browse").disabled =
           !hasName;
@@ -4735,6 +5003,10 @@
       document
         .querySelector("#reservation-invite-browse")
         .addEventListener("click", () => {
+          if (reservationInviteMode === "reservation") {
+            openPreorderMenu("owner");
+            return;
+          }
           if (!reservationInviteName.value.trim()) {
             reservationInviteDialog.querySelector(
               ".reservation-invite-error",
@@ -4746,13 +5018,20 @@
         });
       preorderDialog.querySelector(".preorder-close").addEventListener(
         "click",
-        () => preorderDialog.close(),
+        closePreorderMenu,
       );
       preorderDialog.querySelector(".preorder-cancel").addEventListener(
         "click",
-        () => preorderDialog.close(),
+        closePreorderMenu,
       );
       preorderItemsElement.addEventListener("click", (event) => {
+        const removeButton = event.target.closest("[data-preorder-remove]");
+        if (removeButton) {
+          preorderSelection.delete(Number(removeButton.dataset.dishIndex));
+          preorderStatus.textContent = "";
+          renderPreorderMenu();
+          return;
+        }
         const quantityButton = event.target.closest("[data-preorder-quantity]");
         if (!quantityButton) return;
         const index = Number(quantityButton.dataset.dishIndex);
@@ -4760,9 +5039,21 @@
         const count = Math.max(0, (preorderSelection.get(index) || 0) + change);
         if (count) preorderSelection.set(index, count);
         else preorderSelection.delete(index);
+        preorderStatus.textContent = "";
         renderPreorderMenu();
       });
       preorderSaveButton.addEventListener("click", savePreorderSelection);
+      preorderSuccessDialog
+        .querySelector(".preorder-success-close")
+        .addEventListener("click", () => preorderSuccessDialog.close());
+      preorderSuccessDialog
+        .querySelector(".preorder-new-button")
+        .addEventListener("click", () => {
+          preorderSuccessDialog.close();
+          preorderSelection.clear();
+          preorderStatus.textContent = "";
+          openPreorderMenu(preorderMode);
+        });
 
       function openPreorderMenu(mode) {
         if (mode === "owner" && (!currentAccount || !currentReservation)) {
@@ -4776,13 +5067,23 @@
         preorderSelection.clear();
         preorderStatus.textContent = "";
         document.querySelector("#preorder-title").textContent =
-          mode === "owner" ? "Make Pre-Order" : "Browse Menu";
+          "Browse Menu";
         preorderDialog.querySelector("[data-preorder-subtitle]").textContent =
           mode === "owner"
-            ? "Selected dishes are added to your cart and reservation."
+            ? "Choose dishes to add to your reservation."
             : "Select dishes to add to this reservation.";
         renderPreorderMenu();
+        if (reservationInviteDialog.open) reservationInviteDialog.close();
         preorderDialog.showModal();
+      }
+
+      function closePreorderMenu() {
+        preorderDialog.close();
+        if (preorderMode === "owner" && currentReservation) {
+          openReservationInvitation(currentReservation, { mode: "reservation" });
+        } else if (sharedReservation) {
+          openReservationInvitation(sharedReservation);
+        }
       }
 
       function renderPreorderMenu() {
@@ -4802,11 +5103,11 @@
           image.src = dish.image;
           image.alt = "";
           const info = document.createElement("div");
+          info.className = "preorder-item-info";
           const name = document.createElement("h3");
           name.textContent = dish.name;
-          const price = document.createElement("p");
-          price.textContent = dish.priceText;
-          info.append(name, price);
+          const readyTime = document.createElement("p");
+          readyTime.textContent = "Expected ready time - 10 minutes";
           const quantityControl = document.createElement("div");
           quantityControl.className = "preorder-quantity";
           const decrease = document.createElement("button");
@@ -4824,11 +5125,25 @@
           increase.setAttribute("aria-label", `Add one ${dish.name}`);
           increase.textContent = "+";
           quantityControl.append(decrease, count, increase);
-          row.append(image, info, quantityControl);
+          info.append(name, readyTime, quantityControl);
+          const remove = document.createElement("button");
+          remove.className = "preorder-item-remove";
+          remove.type = "button";
+          remove.dataset.dishIndex = String(index);
+          remove.dataset.preorderRemove = "";
+          remove.setAttribute("aria-label", `Remove ${dish.name} from pre-order`);
+          remove.innerHTML = `
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <path d="M4 7h16M9 7V4h6v3m3 0-.8 13H6.8L6 7m4 3v6m4-6v6" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          `;
+          const price = document.createElement("p");
+          price.className = "preorder-item-price";
+          price.textContent = `$${(dish.price * quantity || dish.price).toFixed(2)}`;
+          row.append(image, info, price, remove);
           preorderItemsElement.append(row);
         }
-        preorderTotalElement.textContent =
-          `Selected total: $${selectedTotal.toFixed(2)}`;
+        preorderTotalElement.textContent = `$${selectedTotal.toFixed(2)}`;
         preorderSaveButton.disabled = selectedCount === 0;
       }
 
@@ -4837,31 +5152,49 @@
           preorderStatus.textContent = "Choose at least one dish to continue.";
           return;
         }
+        const guestName =
+          preorderMode === "guest" ? reservationInviteName.value.trim() : "";
+        if (preorderMode === "guest" && !guestName) {
+          preorderStatus.textContent =
+            "Enter your name in the invitation before adding dishes.";
+          return;
+        }
+
+        const reservation =
+          preorderMode === "owner" ? currentReservation : sharedReservation;
+        if (!reservation) {
+          preorderStatus.textContent =
+            "Your reservation is not available. Please reopen it and try again.";
+          return;
+        }
+        const items = Array.isArray(reservation.cart)
+          ? reservation.cart.map((item) => ({ ...item }))
+          : [];
+        preorderSelection.forEach((quantity, index) => {
+          const dish = getDishCatalogItem(index);
+          if (!dish) return;
+          const existingItem = items.find((item) => item.name === dish.name);
+          if (existingItem) existingItem.quantity += quantity;
+          else {
+            items.push({
+              name: dish.name,
+              price: dish.price,
+              quantity,
+            });
+          }
+        });
+        const updatedReservation = {
+          ...reservation,
+          cart: items,
+          updatedAt: new Date().toISOString(),
+        };
+
         if (preorderMode === "owner") {
-          if (!currentAccount || !currentReservation) {
+          if (!currentAccount) {
             preorderStatus.textContent =
               "Your reservation is not available. Please reopen it and try again.";
             return;
           }
-          const updatedCartItems = cartItems.map((item) => ({ ...item }));
-          preorderSelection.forEach((quantity, index) => {
-            const dish = getDishCatalogItem(index);
-            if (!dish) return;
-            const existingItem = updatedCartItems.find(
-              (item) => item.index === index,
-            );
-            if (existingItem) existingItem.quantity += quantity;
-            else updatedCartItems.push({ ...dish, quantity });
-          });
-          const updatedReservation = {
-            ...currentReservation,
-            cart: updatedCartItems.map((item) => ({
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            })),
-            updatedAt: new Date().toISOString(),
-          };
           try {
             const allReservations = JSON.parse(
               localStorage.getItem(reservationStorageKey) || "{}",
@@ -4895,9 +5228,25 @@
               "The reservation could not be updated in browser storage. Please try again.";
             return;
           }
-          cartItems.splice(0, cartItems.length, ...updatedCartItems);
           currentReservation = updatedReservation;
           activeReservation = { ...updatedReservation };
+          cartItems.splice(
+            0,
+            cartItems.length,
+            ...items.map((item) => {
+              const dish = Array.from({ length: 4 }, (_, index) =>
+                getDishCatalogItem(index),
+              ).find((catalogItem) => catalogItem?.name === item.name);
+              return dish
+                ? { ...dish, quantity: item.quantity }
+                : {
+                    ...item,
+                    index: -1,
+                    image: "",
+                    priceText: `$${item.price.toFixed(2)}`,
+                  };
+            }),
+          );
           renderCart();
           reservationFlowDialog.querySelector(
             ".reservation-share-url",
@@ -4905,42 +5254,57 @@
           reservationFlowDialog.querySelector(
             ".reservation-success-status",
           ).textContent = "Pre-order saved to your cart and reservation.";
-          preorderDialog.close();
-          setReservationStep("success");
-          reservationFlowDialog.showModal();
-          return;
+        } else {
+          sharedReservation = updatedReservation;
+          window.history.replaceState(
+            null,
+            "",
+            createReservationShareUrl(sharedReservation),
+          );
+          showSharedReservationPage(sharedReservation, { historyMode: "none" });
         }
+        preorderSelection.clear();
+        showPreorderConfirmation(updatedReservation);
+      }
 
-        const guestName = reservationInviteName.value.trim();
-        if (!sharedReservation || !guestName) {
-          preorderStatus.textContent =
-            "Enter your name in the invitation before adding dishes.";
-          return;
-        }
-        const items = Array.isArray(sharedReservation.cart)
-          ? sharedReservation.cart.map((item) => ({ ...item }))
-          : [];
-        preorderSelection.forEach((quantity, index) => {
-          const dish = getDishCatalogItem(index);
-          if (!dish) return;
-          const existingItem = items.find((item) => item.name === dish.name);
-          if (existingItem) existingItem.quantity += quantity;
-          else {
-            items.push({
-              name: dish.name,
-              price: dish.price,
-              quantity,
-            });
-          }
+      function showPreorderConfirmation(reservation) {
+        const values = {
+          location: reservation.address || reservation.location,
+          date: formatReservationDate(reservation.date),
+          time: `${reservation.time} – ${reservation.timeEnd}`,
+          guests: `${reservation.guests} ${
+            reservation.guests === 1 ? "person" : "people"
+          }`,
+        };
+        preorderSuccessView
+          .querySelectorAll("[data-preorder-value]")
+          .forEach((element) => {
+            element.textContent = values[element.dataset.preorderValue];
+          });
+        const hostName =
+          preorderMode === "guest"
+            ? reservation.inviter || "Your host"
+            : currentAccount?.firstName || reservation.inviter || "Your host";
+        preorderSuccessView.querySelector(".preorder-success-copy").textContent =
+          `Your selections have been added to ${hostName}'s table. The restaurant will have everything ready for you.`;
+        preorderConfirmationItems.replaceChildren();
+        const items = Array.isArray(reservation.cart) ? reservation.cart : [];
+        let total = 0;
+        items.forEach((item) => {
+          const row = document.createElement("p");
+          row.className = "preorder-confirmation-item";
+          const name = document.createElement("span");
+          name.textContent = `${item.name} × ${item.quantity}`;
+          const price = document.createElement("span");
+          const itemTotal = item.price * item.quantity;
+          price.textContent = `$${itemTotal.toFixed(2)}`;
+          total += itemTotal;
+          row.append(name, price);
+          preorderConfirmationItems.append(row);
         });
-        sharedReservation = { ...sharedReservation, cart: items };
-        const updatedLink = createReservationShareUrl(sharedReservation);
-        window.history.replaceState(null, "", updatedLink);
-        showSharedReservationPage(sharedReservation, { historyMode: "none" });
-        reservationInviteDialog.querySelector(
-          ".reservation-invite-status",
-        ).textContent = `Thanks, ${guestName}! Your dishes were added to the reservation.`;
+        preorderConfirmationTotal.textContent = `$${total.toFixed(2)}`;
         preorderDialog.close();
+        preorderSuccessDialog.showModal();
       }
 
       function getLocalDateString(date) {
@@ -5610,8 +5974,7 @@
             view.type = "button";
             view.textContent = "View Reservation";
             view.addEventListener("click", () => {
-              reservationFlowDialog.close();
-              showSharedReservationPage(reservation);
+              openOwnerReservation(reservation);
             });
             card.append(title, details, view);
             reservationSavedList.append(card);
@@ -5619,6 +5982,13 @@
         }
         setReservationStep("list");
         reservationFlowDialog.showModal();
+      }
+
+      function openOwnerReservation(reservation) {
+        currentReservation = { ...reservation };
+        activeReservation = { ...reservation };
+        reservationFlowDialog.close();
+        openReservationInvitation(currentReservation, { mode: "reservation" });
       }
 
       function addSharedReservationDetail(container, label, value) {
@@ -5696,7 +6066,8 @@
         if (showInvitation) openReservationInvitation(reservation);
       }
 
-      function openReservationInvitation(reservation) {
+      function openReservationInvitation(reservation, { mode = "guest" } = {}) {
+        reservationInviteMode = mode;
         const values = {
           inviter: reservation.inviter || "Your host",
           location: reservation.address || reservation.location,
@@ -5711,11 +6082,24 @@
           .forEach((element) => {
             element.textContent = values[element.dataset.inviteValue];
           });
-        reservationInviteName.value = "";
-        document.querySelector("#reservation-invite-browse").disabled = true;
+        const isGuestInvitation = mode === "guest";
+        reservationInviteDialog.querySelector("#reservation-invite-title").textContent =
+          isGuestInvitation ? "You’re Invited!" : "Reservation";
+        reservationInviteDialog.querySelector("[data-invitation-copy]").hidden =
+          !isGuestInvitation;
         reservationInviteDialog.querySelector(
+          "[data-invitation-name-label]",
+        ).hidden = !isGuestInvitation;
+        reservationInviteName.hidden = !isGuestInvitation;
+        const invitationError = reservationInviteDialog.querySelector(
           ".reservation-invite-error",
-        ).textContent = "";
+        );
+        invitationError.hidden = !isGuestInvitation;
+        invitationError.textContent = "";
+        reservationInviteName.value = "";
+        document.querySelector("#reservation-invite-browse").disabled = false;
+        reservationInviteDialog.querySelector("#reservation-invite-browse").textContent =
+          "Browse Menu";
         reservationInviteDialog.querySelector(
           ".reservation-invite-status",
         ).textContent = "";

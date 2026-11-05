@@ -29,11 +29,14 @@ browsers or sent to the restaurant.
 ## Shopping cart
 
 The shopping cart is available after signing in and is kept in memory for the
-current page session. Pre-orders can be added to a reservation from its
-confirmation dialog or invitation link. Invitation links contain the reservation
-and pre-order details in the URL fragment; this data is readable by anyone who
-has the link and is not encrypted. Orders and checkout are not connected to a
-restaurant.
+current page session. Owners can view reservation details without entering a
+guest name, then browse the menu and submit a pre-order. Guests can do the same
+from an invitation link after entering their name. Submitting shows a summary
+with the reservation details, items, and total; another pre-order can be
+started from that confirmation. Invitation links contain the reservation and
+pre-order details in the URL fragment; this data is readable by anyone with
+the link and is not encrypted. Data is stored only in the current browser and
+orders are not sent to a restaurant.
 
 ## Build the container
 
