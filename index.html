@@ -1447,6 +1447,7 @@
       }
 
       .reservation-invite-content {
+        position: relative;
         padding: clamp(24px, 6vw, 36px);
       }
 
@@ -1454,11 +1455,40 @@
         display: none;
       }
 
+      .reservation-invite-close {
+        position: absolute;
+        top: 20px;
+        right: 20px;
+        display: grid;
+        width: 30px;
+        height: 30px;
+        place-items: center;
+        padding: 0;
+        border: 0;
+        border-radius: 50%;
+        background: transparent;
+        color: #555b53;
+        cursor: pointer;
+      }
+
+      .reservation-invite-close:hover {
+        background: #f0f3ed;
+      }
+
+      .reservation-invite-close svg {
+        width: 18px;
+        height: 18px;
+      }
+
       .reservation-invite-content h2,
       .preorder-heading h2 {
         margin: 0 0 8px;
         font-size: 26px;
         letter-spacing: -0.035em;
+      }
+
+      .reservation-invite-content h2 {
+        padding-right: 28px;
       }
 
       .reservation-invite-copy {
@@ -1523,6 +1553,56 @@
         width: 100%;
         min-height: 46px;
         margin-top: 5px;
+      }
+
+      .reservation-invite-link {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        margin: 8px 0;
+        padding: 7px;
+        border: 1px solid #cce8cd;
+        border-radius: 8px;
+        background: #f0fff1;
+      }
+
+      .reservation-invite-link input {
+        min-width: 0;
+        min-height: 32px;
+        padding: 0 4px;
+        border: 0;
+        outline: 0;
+        background: transparent;
+        color: #425348;
+        font-size: 10px;
+      }
+
+      .reservation-invite-copy-link {
+        display: grid;
+        width: 32px;
+        height: 32px;
+        flex: 0 0 auto;
+        place-items: center;
+        border: 0;
+        border-radius: 6px;
+        background: transparent;
+        color: var(--green-dark);
+        cursor: pointer;
+      }
+
+      .reservation-invite-copy-link:hover {
+        background: #e3f3e3;
+      }
+
+      .reservation-invite-copy-link svg {
+        width: 19px;
+        height: 19px;
+      }
+
+      .reservation-invite-cancel {
+        width: 100%;
+        min-height: 42px;
+        margin-top: 8px;
       }
 
       .reservation-invite-browse:disabled {
@@ -3815,6 +3895,20 @@
       aria-labelledby="reservation-invite-title"
     >
       <div class="reservation-invite-content">
+        <button
+          class="reservation-invite-close"
+          type="button"
+          aria-label="Close reservation"
+        >
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path
+              d="m6 6 12 12M18 6 6 18"
+              stroke="currentColor"
+              stroke-width="1.8"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
         <p class="eyebrow">Green &amp; Tasty</p>
         <h2 id="reservation-invite-title">You&rsquo;re Invited!</h2>
         <p class="reservation-invite-copy" data-invitation-copy>
@@ -3840,6 +3934,35 @@
         />
         <p class="reservation-invite-error" role="alert"></p>
         <p class="reservation-invite-status" role="status" aria-live="polite"></p>
+        <div class="reservation-invite-link" data-reservation-link hidden>
+          <input
+            class="reservation-invite-url"
+            aria-label="Unique reservation order link"
+            readonly
+          />
+          <button
+            class="reservation-invite-copy-link"
+            type="button"
+            aria-label="Copy reservation order link"
+          >
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <rect
+                x="8"
+                y="8"
+                width="12"
+                height="13"
+                rx="2"
+                stroke="currentColor"
+                stroke-width="1.7"
+              />
+              <path
+                d="M16 8V5a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h2"
+                stroke="currentColor"
+                stroke-width="1.7"
+              />
+            </svg>
+          </button>
+        </div>
         <button
           class="button reservation-invite-browse"
           id="reservation-invite-browse"
@@ -3847,6 +3970,14 @@
           disabled
         >
           Browse Menu
+        </button>
+        <button
+          class="button reservation-button-light reservation-invite-cancel"
+          type="button"
+          data-reservation-cancel
+          hidden
+        >
+          Cancel
         </button>
       </div>
     </dialog>
@@ -4976,7 +5107,7 @@
       });
       reservationFlowDialog
         .querySelector(".reservation-copy-link")
-        .addEventListener("click", copyReservationLink);
+        .addEventListener("click", () => copyReservationLink());
       reservationFlowDialog
         .querySelector(".reservation-view-button")
         .addEventListener("click", () => {
@@ -4989,6 +5120,22 @@
           reservationFlowDialog.close();
           openPreorderMenu("owner");
         });
+      reservationInviteDialog
+        .querySelector(".reservation-invite-close")
+        .addEventListener("click", () => reservationInviteDialog.close());
+      reservationInviteDialog
+        .querySelector("[data-reservation-cancel]")
+        .addEventListener("click", () => reservationInviteDialog.close());
+      reservationInviteDialog
+        .querySelector(".reservation-invite-copy-link")
+        .addEventListener("click", () =>
+          copyReservationLink(
+            reservationInviteDialog.querySelector(".reservation-invite-url"),
+            reservationInviteDialog.querySelector(
+              ".reservation-invite-status",
+            ),
+          ),
+        );
       reservationInviteName.addEventListener("input", () => {
         if (reservationInviteMode !== "guest") return;
         const hasName = Boolean(reservationInviteName.value.trim());
@@ -5079,11 +5226,6 @@
 
       function closePreorderMenu() {
         preorderDialog.close();
-        if (preorderMode === "owner" && currentReservation) {
-          openReservationInvitation(currentReservation, { mode: "reservation" });
-        } else if (sharedReservation) {
-          openReservationInvitation(sharedReservation);
-        }
       }
 
       function renderPreorderMenu() {
@@ -5921,13 +6063,12 @@
         reservationFlowDialog.showModal();
       }
 
-      async function copyReservationLink() {
-        const input = reservationFlowDialog.querySelector(
-          ".reservation-share-url",
-        );
-        const status = reservationFlowDialog.querySelector(
+      async function copyReservationLink(
+        input = reservationFlowDialog.querySelector(".reservation-share-url"),
+        status = reservationFlowDialog.querySelector(
           ".reservation-success-status",
-        );
+        ),
+      ) {
         try {
           await navigator.clipboard.writeText(input.value);
           status.textContent = "Reservation link copied.";
@@ -6068,6 +6209,7 @@
 
       function openReservationInvitation(reservation, { mode = "guest" } = {}) {
         reservationInviteMode = mode;
+        const isGuestInvitation = mode === "guest";
         const values = {
           inviter: reservation.inviter || "Your host",
           location: reservation.address || reservation.location,
@@ -6082,7 +6224,6 @@
           .forEach((element) => {
             element.textContent = values[element.dataset.inviteValue];
           });
-        const isGuestInvitation = mode === "guest";
         reservationInviteDialog.querySelector("#reservation-invite-title").textContent =
           isGuestInvitation ? "You’re Invited!" : "Reservation";
         reservationInviteDialog.querySelector("[data-invitation-copy]").hidden =
@@ -6096,6 +6237,12 @@
         );
         invitationError.hidden = !isGuestInvitation;
         invitationError.textContent = "";
+        reservationInviteDialog.querySelector("[data-reservation-link]").hidden =
+          isGuestInvitation;
+        reservationInviteDialog.querySelector(".reservation-invite-url").value =
+          isGuestInvitation ? "" : createReservationShareUrl(reservation);
+        reservationInviteDialog.querySelector("[data-reservation-cancel]").hidden =
+          isGuestInvitation;
         reservationInviteName.value = "";
         document.querySelector("#reservation-invite-browse").disabled = false;
         reservationInviteDialog.querySelector("#reservation-invite-browse").textContent =
