@@ -200,12 +200,6 @@
         gap: 7px;
       }
 
-      .currency-demo-rate {
-        color: #777d74;
-        font-size: 9px;
-        white-space: nowrap;
-      }
-
       .header-setting-group {
         display: inline-flex;
         align-items: center;
@@ -542,6 +536,7 @@
       }
 
       .dish-card {
+        position: relative;
         overflow: hidden;
         border: 1px solid rgb(32 35 31 / 5%);
         border-radius: 18px;
@@ -578,11 +573,11 @@
 
       .dish-info {
         display: flex;
-        min-height: 104px;
+        min-height: 130px;
         align-items: flex-start;
         justify-content: space-between;
         gap: 12px;
-        padding: 4px 18px 16px;
+        padding: 4px 18px 55px;
       }
 
       .dish-info-copy {
@@ -612,12 +607,18 @@
       }
 
       .dish-add-to-cart {
+        position: absolute;
+        left: 50%;
+        bottom: 14px;
         display: inline-flex;
+        width: max-content;
+        max-width: calc(100% - 16px);
         min-height: 34px;
         align-items: center;
         gap: 7px;
-        margin-top: 10px;
+        margin: 0;
         padding: 0 11px;
+        white-space: nowrap;
         border: 1px solid var(--green);
         border-radius: 8px;
         background: var(--white);
@@ -626,14 +627,17 @@
         font-size: 11px;
         font-weight: 650;
         cursor: pointer;
+        transform: translateX(-50%);
         transition:
           background 160ms ease,
-          color 160ms ease;
+          color 160ms ease,
+          transform 160ms ease;
       }
 
       .dish-add-to-cart:hover {
         background: var(--green);
         color: var(--white);
+        transform: translate(-50%, -2px);
       }
 
       .dish-add-to-cart svg {
@@ -3000,9 +3004,9 @@
         }
 
         .dish-info {
-          min-height: 66px;
+          min-height: 116px;
           gap: 8px;
-          padding: 4px 13px 15px;
+          padding: 4px 13px 50px;
         }
 
         .dish-info h3 {
@@ -3011,6 +3015,19 @@
 
         .dish-price {
           font-size: 12px;
+        }
+
+        .dish-add-to-cart {
+          bottom: 12px;
+          min-height: 31px;
+          gap: 5px;
+          padding-inline: 8px;
+          font-size: 10px;
+        }
+
+        .dish-add-to-cart svg {
+          width: 13px;
+          height: 13px;
         }
 
         .dish-dialog {
@@ -3418,7 +3435,6 @@
               UAH
             </button>
           </div>
-          <small class="currency-demo-rate">Demo rate: $1 = ₴40</small>
         </div>
       </div>
     </header>
@@ -4795,6 +4811,13 @@
         ...document.querySelectorAll("[data-currency]"),
       ];
       const originalTextNodes = new WeakMap();
+      const originalAttributes = new WeakMap();
+      const translatableAttributes = [
+        "alt",
+        "aria-label",
+        "placeholder",
+        "title",
+      ];
       const ukrainianTranslations = {
         "Our story": "Наша історія",
         "Our Menu": "Наше меню",
@@ -4802,10 +4825,14 @@
         "Book a table": "Забронювати столик",
         Reservations: "Бронювання",
         Contact: "Контакти",
+        "Language and currency settings": "Налаштування мови та валюти",
+        Language: "Мова",
+        Currency: "Валюта",
         "Sign In": "Увійти",
         "Sign in to Your Account": "Увійдіть у свій акаунт",
         "Sign in to add to your cart": "Увійдіть, щоб додати страву до кошика",
         "Create an Account": "Створити акаунт",
+        "Forgot password?": "Забули пароль?",
         "Most Popular Dishes": "Найпопулярніші страви",
         "Our Locations": "Наші локації",
         "Get in Touch": "Зв'яжіться з нами",
@@ -4835,8 +4862,11 @@
         "Meet us in Tbilisi.": "Зустріньтеся з нами в Тбілісі.",
         "Customer Reviews": "Відгуки гостей",
         "Reservation details": "Деталі бронювання",
+        Reservation: "Бронювання",
         "Pre-order": "Передзамовлення",
         "Your Cart": "Ваш кошик",
+        Total: "Разом",
+        Checkout: "Оформити замовлення",
         "Add to Cart": "Додати до кошика",
         "Book a Table": "Забронювати столик",
         Email: "Електронна пошта",
@@ -4844,6 +4874,10 @@
         "First Name": "Ім'я",
         "Last Name": "Прізвище",
         "Confirm New Password": "Підтвердьте новий пароль",
+        "e.g. username@domain.com": "name@example.com",
+        "e.g. Jonson": "наприклад, Іван",
+        "e.g. Doe": "наприклад, Петренко",
+        "e.g. Jonson D.": "наприклад, Іван П.",
         "Not now": "Не зараз",
         "Check Availability": "Перевірити наявність",
         "Submit Pre-Order": "Надіслати передзамовлення",
@@ -4877,6 +4911,13 @@
           "Оплата недоступна в демоверсії. Щоб зробити замовлення, зв'яжіться з рестораном.",
         "Book Your Table": "Забронюйте столик",
         Location: "Локація",
+        "48 Rustaveli Avenue": "Проспект Руставелі, 48",
+        "14 Baratashvili Street": "Вулиця Бараташвілі, 14",
+        "9 Abashidze Street": "Вулиця Абашидзе, 9",
+        "48 Rustaveli Avenue, Tbilisi": "Проспект Руставелі, 48, Тбілісі",
+        "14 Baratashvili Street, Tbilisi": "Вулиця Бараташвілі, 14, Тбілісі",
+        "9 Abashidze Street, Tbilisi": "Вулиця Абашидзе, 9, Тбілісі",
+        "430 g": "430 г",
         Date: "Дата",
         Time: "Час",
         "Guests (max. 4)": "Гості (до 4)",
@@ -4914,9 +4955,271 @@
         "No tables match your selected date, time, and party size.":
           "На вибрані дату, час і кількість гостей столиків немає.",
         "Try Again": "Спробувати ще раз",
-        "Demo rate: $1 = ₴40": "Демо-курс: $1 = ₴40",
+        "Green & Tasty | Fresh food in Tbilisi":
+          "Green & Tasty | Свіжа їжа в Тбілісі",
+        "Our story": "Наша історія",
+        Locations: "Локації",
+        Contact: "Контакти",
+        "Sign out": "Вийти",
+        "Show": "Показати",
+        "Don’t have an account?": "Ще не маєте акаунта?",
+        "Already have an account?": "Вже маєте акаунт?",
+        "Sign in instead": "Увійти",
+        "8–12 characters": "8–12 символів",
+        "Includes uppercase and lowercase letters":
+          "Містить великі та малі літери",
+        "Includes a number": "Містить цифру",
+        "Includes a symbol": "Містить спеціальний символ",
+        "Please sign in to add dishes to your shopping cart.":
+          "Увійдіть, щоб додати страви до кошика.",
+        "All locations": "Усі локації",
+        "For groups larger than 4, please contact the restaurant directly.":
+          "Для груп понад 4 особи, будь ласка, зв'яжіться безпосередньо з рестораном.",
+        "For groups larger than 4, please contact the restaurant directly.":
+          "Для груп понад 4 особи, будь ласка, зв'яжіться безпосередньо з рестораном.",
+        "Fresh, local, and full of life": "Свіже, місцеве та сповнене життя",
+        "FRESH, LOCAL, AND FULL OF LIFE": "СВІЖЕ, МІСЦЕВЕ ТА СПОВНЕНЕ ЖИТТЯ",
+        "A little about us": "Трохи про нас",
+        "A LITTLE ABOUT US": "ТРОХИ ПРО НАС",
+        "What matters to us": "Наші цінності",
+        "Rooted in good things.": "З любов'ю до справжнього.",
+        "Fresh by nature": "Природна свіжість",
+        "Good for everyone": "Добре для кожного",
+        "Made to be shared": "Створено для спільних моментів",
+        "Seasonal bowls • Vegan friendly": "Сезонні страви • Веганські опції",
+        "SEASONAL BOWLS • VEGAN FRIENDLY":
+          "СЕЗОННІ СТРАВИ • ВЕГАНСЬКІ ОПЦІЇ",
+        "A thoughtful plate": "Страва з турботою",
+        "A THOUGHTFUL PLATE": "СТРАВА З ТУРБОТОЮ",
+        "We keep things fresh, let seasonal produce shine, and make space for food that feels good to eat and good to share.":
+          "Ми обираємо свіжі продукти сезону й готуємо страви, якими приємно насолоджуватися та ділитися.",
+        "Come on in": "Завітайте до нас",
+        "COME ON IN": "ЗАВІТАЙТЕ ДО НАС",
+        "Find a Green & Tasty table, settle in, and make yourself at home.":
+          "Знайдіть столик у Green & Tasty, влаштуйтеся зручніше й почувайтеся як удома.",
+        "Daily occupancy: 90%": "Заповнюваність за день: 90%",
+        "Daily occupancy: 75%": "Заповнюваність за день: 75%",
+        "Daily occupancy: 80%": "Заповнюваність за день: 80%",
+        "Ready to visit? Find Green & Tasty restaurants in Tbilisi and plan your next meal.":
+          "Готові завітати? Знайдіть ресторани Green & Tasty у Тбілісі та заплануйте наступний візит.",
+        "Find us on the map": "Знайдіть нас на мапі",
+        "Fresh food, good company, Tbilisi.":
+          "Свіжа їжа, гарна компанія, Тбілісі.",
+        "View menu": "Переглянути меню",
+        "Sort by:": "Сортувати:",
+        "Sort customer reviews": "Сортувати відгуки гостей",
+        "Newest first": "Спочатку нові",
+        "Top rated first": "Спочатку з найвищою оцінкою",
+        "Low rated first": "Спочатку з найнижчою оцінкою",
+        "Oldest first": "Спочатку давні",
+        "You’re Invited!": "Вас запрошено!",
+        "Your host": "Ваш організатор",
+        "invited you to": "запрошує вас",
+        "pre-order for an upcoming reservation.":
+          "зробити передзамовлення до майбутнього бронювання.",
+        "invited you to pre-order for an upcoming reservation.":
+          "запрошує вас зробити передзамовлення до майбутнього бронювання.",
+        "Share this public link to show your reservation and pre-order to your group.":
+          "Поділіться цим відкритим посиланням, щоб показати групі бронювання та передзамовлення.",
+        Restaurant: "Ресторан",
+        "Enter Your Name": "Введіть ваше ім'я",
+        "Select dishes to add to the reservation.":
+          "Оберіть страви, щоб додати їх до бронювання.",
+        "Grand Total": "Разом",
+        "Please enter your name to continue.":
+          "Введіть своє ім'я, щоб продовжити.",
+        "Choose at least one dish to continue.":
+          "Оберіть принаймні одну страву, щоб продовжити.",
+        "Enter your name in the invitation before adding dishes.":
+          "Введіть своє ім'я у запрошенні, перш ніж додавати страви.",
+        "Your reservation is not available. Please reopen it and try again.":
+          "Бронювання недоступне. Відкрийте його знову та спробуйте ще раз.",
+        "Pre-order saved to your cart and reservation.":
+          "Передзамовлення додано до кошика та бронювання.",
+        "No dishes were added to the pre-order.":
+          "До передзамовлення ще не додано страв.",
+        "Your selections have been added to":
+          "Ваш вибір додано до бронювання гостя",
+        "table. The restaurant will have everything ready for you.":
+          ". Ресторан підготує все до вашого візиту.",
+        "Fresh Strawberry Mint Salad": "Салат із полуницею та м'ятою",
+        "Avocado Pine Nut Bowl": "Боул з авокадо та кедровими горіхами",
+        "Roasted Sweet Potato Salad": "Салат із запеченим бататом",
+        "Spring Salad": "Весняний салат",
+        "Calories:": "Калорійність:",
+        "Protein:": "Білки:",
+        "Fats:": "Жири:",
+        "Carbs:": "Вуглеводи:",
+        "Vitamins & minerals:": "Вітаміни та мінерали:",
+        "1 hour": "1 година",
+        "1.5 hours": "1,5 години",
+        "2 hours": "2 години",
+        "2.5 hours": "2,5 години",
+        "Please choose a restaurant location.":
+          "Оберіть локацію ресторану.",
+        "Choose an available time. Past times are not available.":
+          "Оберіть вільний час. Час, що минув, недоступний.",
+        "That time has just been booked. Please choose another available time.":
+          "Цей час щойно забронювали. Будь ласка, оберіть інший вільний час.",
+        "That time has just been booked. Please edit your reservation and choose another time.":
+          "Цей час щойно забронювали. Змініть бронювання та оберіть інший час.",
+        "Availability could not be checked. Please refresh the page and try again.":
+          "Не вдалося перевірити наявність. Оновіть сторінку та спробуйте ще раз.",
+        "No tables match your selected date, time, and party size.":
+          "На вибрані дату, час і кількість гостей столиків немає.",
+        "Available tables are shown on the right. Select a time to continue.":
+          "Праворуч показано вільні столики. Оберіть час, щоб продовжити.",
+        "table": "столик",
+        "tables": "столики",
+        "all available times": "усі вільні години",
+        "guest": "гість",
+        "guests": "гостей",
+        "person": "особа",
+        "people": "осіб",
+        "minutes": "хвилин",
+        "minute": "хвилину",
+        "Email address is required. Please enter your email to continue.":
+          "Вкажіть електронну пошту, щоб продовжити.",
+        "Use 8–12 characters with uppercase and lowercase letters, a number, and a symbol.":
+          "Використайте 8–12 символів, великі й малі літери, цифру та спеціальний символ.",
+        "This field is required.": "Це поле обов'язкове.",
+        "Please confirm your password.": "Підтвердьте пароль.",
+        "Passwords do not match.": "Паролі не збігаються.",
+        "An account with this email already exists.":
+          "Акаунт із цією електронною адресою вже існує.",
+        "Incorrect email or password. Try again or create an account.":
+          "Неправильна електронна пошта або пароль. Спробуйте ще раз або створіть акаунт.",
+        "Sign in to confirm your reservation.":
+          "Увійдіть, щоб підтвердити бронювання.",
+        "Reservation link copied.": "Посилання на бронювання скопійовано.",
+        "Could not copy automatically. Select and copy the link above.":
+          "Не вдалося скопіювати автоматично. Виділіть і скопіюйте посилання вище.",
+        "Reservations could not be loaded from browser storage.":
+          "Не вдалося завантажити бронювання зі сховища браузера.",
+        "Reservation confirmed for this page session, but could not be saved to browser storage.":
+          "Бронювання підтверджено лише в цій сесії сторінки, але не вдалося зберегти його у сховищі браузера.",
+        "Close navigation": "Закрити навігацію",
+        "Open navigation": "Відкрити навігацію",
+        "Shopping cart": "Кошик",
+        "Account": "Акаунт",
+        "Close sign-in dialog": "Закрити вікно входу",
+        "Close sign-in prompt": "Закрити запит на вхід",
+        "Close shopping cart": "Закрити кошик",
+        "Close dish details": "Закрити опис страви",
+        "Close booking form": "Закрити форму бронювання",
+        "Close reservation": "Закрити бронювання",
+        "Close reservation editor": "Закрити редагування бронювання",
+        "Close reservation confirmation": "Закрити підтвердження бронювання",
+        "Close reservations": "Закрити список бронювань",
+        "Close location details": "Закрити інформацію про локацію",
+        "Close pre-order menu": "Закрити меню передзамовлення",
+        "Close pre-order confirmation": "Закрити підтвердження передзамовлення",
+        "Remove one guest": "Зменшити кількість гостей на одного",
+        "Add one guest": "Збільшити кількість гостей на одного",
+        "Scroll to top": "Прокрутити нагору",
+        "Green & Tasty home": "На головну Green & Tasty",
+        "Main navigation": "Головна навігація",
+        "Footer navigation": "Навігація внизу сторінки",
+        "Show password": "Показати пароль",
+        "Hide password": "Приховати пароль",
+        "Password requirements": "Вимоги до пароля",
+        "Public reservation link": "Публічне посилання на бронювання",
+        "Copy reservation link": "Скопіювати посилання на бронювання",
+        "Unique reservation order link": "Унікальне посилання на передзамовлення",
+        "Copy reservation order link": "Скопіювати посилання на передзамовлення",
+        "Freshly prepared dish": "Свіжоприготовлена страва",
+        "A table set for a restaurant reservation":
+          "Сервірований столик для бронювання в ресторані",
+        "Fresh Strawberry Mint Salad with spinach, mint, and feta":
+          "Салат із полуницею та м'ятою, шпинатом і фетою",
+        "Avocado Pine Nut Bowl with fresh greens and cherry tomatoes":
+          "Боул з авокадо, свіжою зеленню та помідорами чері",
+        "Roasted Sweet Potato Salad with fresh greens":
+          "Салат із запеченим бататом і свіжою зеленню",
+        "Spring Salad with avocado and seasonal vegetables":
+          "Весняний салат з авокадо та сезонними овочами",
+        "Warm, plant-filled restaurant interior":
+          "Затишний інтер'єр ресторану з рослинами",
+        "Cosy restaurant dining room": "Затишна обідня зала ресторану",
+        "Bright restaurant filled with plants":
+          "Світлий ресторан, наповнений рослинами",
+        "View details for 48 Rustaveli Avenue":
+          "Переглянути інформацію про локацію на проспекті Руставелі, 48",
+        "View details for 14 Baratashvili Street":
+          "Переглянути інформацію про локацію на вулиці Бараташвілі, 14",
+        "View details for 9 Abashidze Street":
+          "Переглянути інформацію про локацію на вулиці Абашидзе, 9",
+        "View Fresh Strawberry Mint Salad ingredients":
+          "Переглянути склад салату з полуницею та м'ятою",
+        "View Avocado Pine Nut Bowl ingredients":
+          "Переглянути склад боулу з авокадо та кедровими горіхами",
+        "View Roasted Sweet Potato Salad ingredients":
+          "Переглянути склад салату із запеченим бататом",
+        "View Spring Salad ingredients": "Переглянути склад весняного салату",
         "Prices are converted at an estimated demo rate":
-          "Ціни перераховано за орієнтовним демонстраційним курсом",
+          "Ціни перераховуються за орієнтовним курсом",
+        "Green & Tasty brings fresh, locally sourced food and modern Georgian flavours to Tbilisi.":
+          "Green & Tasty пропонує свіжі місцеві продукти та сучасні страви грузинської кухні в Тбілісі.",
+        "A Tbilisi restaurant family celebrating fresh ingredients, thoughtful cooking, and the generous spirit of Georgian food.":
+          "Сім'я ресторанів у Тбілісі, де цінують свіжі продукти, продумане приготування та щедру грузинську гостинність.",
+        "Green & Tasty brings together a network of restaurants in Tbilisi, Georgia. We make fresh, locally sourced ingredients the starting point for food that feels both nourishing and full of character.":
+          "Green & Tasty об'єднує мережу ресторанів у Тбілісі, Грузія. Ми готуємо страви з місцевих свіжих продуктів — поживні, яскраві та сповнені характеру.",
+        "Our menu takes inspiration from the rich flavours of Georgian cuisine, with a modern twist and plenty of vegetarian and vegan choices to share around the table.":
+          "Наше меню натхненне насиченими смаками грузинської кухні, доповненими сучасними нотками та різноманітними вегетаріанськими й веганськими стравами для спільного столу.",
+        "A cosy stop on Baratashvili Street, with soft light, natural wood, and a room full of greenery. Drop by for a slow brunch, share a few seasonal plates with friends, or settle in for a relaxed dinner in the heart of Tbilisi.":
+          "Затишний ресторан на вулиці Бараташвілі з м'яким світлом, натуральним деревом і зеленню. Завітайте на неквапливий бранч, розділіть сезонні страви з друзями або проведіть спокійний вечір у самому серці Тбілісі.",
+        "Find a little green retreat on Abashidze Street in the lively Vake neighbourhood. This light-filled dining room pairs comforting local ingredients with a fresh, modern touch—ideal for a leisurely meal or catching up with friends.":
+          "Знайдіть зелений куточок на вулиці Абашидзе в жвавому районі Ваке. Світлий зал і місцеві продукти з сучасним акцентом створюють ідеальне місце для неквапливої трапези чи зустрічі з друзями.",
+        "Settle in at our leafy Rustaveli dining room, where garden-inspired plates meet the lively rhythm of the city. A bright, welcoming space with a relaxed terrace, seasonal Georgian flavours, and plenty of room to linger over lunch or dinner.":
+          "Розташуйтеся в затишному ресторані на проспекті Руставелі, де страви з садовими мотивами поєднуються з ритмом міста. На вас чекають світлий зал, тераса й сезонні грузинські смаки.",
+        "Strawberries, spinach, mint leaves, feta or goat cheese, walnuts, balsamic glaze, and poppy seeds.":
+          "Полуниця, шпинат, листя м'яти, фета або козячий сир, волоські горіхи, бальзамічна глазур і мак.",
+        "Ripe avocado, baby spinach, cucumber, cherry tomatoes, toasted pine nuts, pumpkin seeds, and lemon-herb dressing.":
+          "Стигле авокадо, молодий шпинат, огірок, помідори чері, підсмажені кедрові горіхи, гарбузове насіння та лимонно-трав'яна заправка.",
+        "Roasted sweet potato, green lentils, baby spinach, red onion, parsley, toasted seeds, and a tangy lemon-tahini dressing.":
+          "Запечений батат, зелена сочевиця, молодий шпинат, червона цибуля, петрушка, підсмажене насіння та пікантна лимонно-тахінна заправка.",
+        "Crisp seasonal greens, avocado, cucumber, cherry tomatoes, radish, fresh herbs, and a light citrus dressing.":
+          "Хрумка сезонна зелень, авокадо, огірок, помідори чері, редиска, свіжа зелень і легка цитрусова заправка.",
+        "Protein: 18–20 g · Fats: 33–35 g · Carbs: 30–35 g":
+          "Білки: 18–20 г · Жири: 33–35 г · Вуглеводи: 30–35 г",
+        "Protein: 14–17 g · Fats: 38–42 g · Carbs: 25–30 g":
+          "Білки: 14–17 г · Жири: 38–42 г · Вуглеводи: 25–30 г",
+        "Protein: 17–20 g · Fats: 19–23 g · Carbs: 58–64 g":
+          "Білки: 17–20 г · Жири: 19–23 г · Вуглеводи: 58–64 г",
+        "Protein: 12–15 g · Fats: 27–31 g · Carbs: 34–40 g":
+          "Білки: 12–15 г · Жири: 27–31 г · Вуглеводи: 34–40 г",
+        "Vitamins & minerals: Vitamin C, Vitamin A, calcium, and iron":
+          "Вітаміни та мінерали: вітаміни C й A, кальцій та залізо",
+        "Vitamins & minerals: Vitamin E, Vitamin K, folate, and magnesium":
+          "Вітаміни та мінерали: вітаміни E й K, фолат та магній",
+        "Vitamins & minerals: Vitamin A, Vitamin C, iron, and potassium":
+          "Вітаміни та мінерали: вітаміни A й C, залізо та калій",
+        "Vitamins & minerals: Vitamins A, C, and K, folate, and potassium":
+          "Вітаміни та мінерали: вітаміни A, C і K, фолат та калій",
+        "Loved the leafy terrace and the fresh seasonal menu. The staff made us feel at home, and the roasted vegetables were wonderful. We will be back soon!":
+          "Сподобалися зелена тераса та свіже сезонне меню. Персонал створив домашню атмосферу, а запечені овочі були чудові. Обов'язково повернемося!",
+        "A lovely place right in the city. Thoughtful vegetarian dishes, generous portions, and a warm atmosphere. The house lemonade was a perfect finish.":
+          "Чудове місце в самому центрі міста. Продумані вегетаріанські страви, щедрі порції та тепла атмосфера. Домашній лимонад став ідеальним завершенням.",
+        "Beautiful room full of plants and a great menu for our group. Everything tasted fresh and arrived together. Booking ahead is a good idea on weekends.":
+          "Гарний зал, повний рослин, і чудове меню для компанії. Усе було свіжим і подали одночасно. На вихідні краще бронювати заздалегідь.",
+        "One of my favourite stops on Rustaveli. Fresh ingredients, a kind welcome, and a calm terrace away from the busy street.":
+          "Одне з моїх улюблених місць на Руставелі. Свіжі продукти, привітний прийом і затишна тераса подалі від гамірної вулиці.",
+        "Such a cosy neighbourhood restaurant. We shared several small plates and loved every one. Friendly team and a lovely quiet corner for dinner.":
+          "Дуже затишний районний ресторан. Замовили кілька невеликих страв — кожна була чудова. Привітна команда й тихий куточок для вечері.",
+        "Fresh food, beautiful presentation, and a relaxed pace. The seasonal bowl was filling without feeling heavy. A new favourite in Vera.":
+          "Свіжа їжа, гарна подача й некваплива атмосфера. Сезонний боул був ситним, але легким. Нове улюблене місце у Вері.",
+        "Brunch was delicious and the room is full of plants. We had a great time catching up over coffee and sharing a generous salad.":
+          "Бранч був смачним, а зал наповнений рослинами. Чудово провели час за кавою та великою порцією салату.",
+        "Warm welcome, thoughtful menu, and excellent fresh bread. I appreciated the range of vegetarian options for our whole group.":
+          "Теплий прийом, продумане меню та чудовий свіжий хліб. Сподобався вибір вегетаріанських страв для всієї компанії.",
+        "A wonderful pause during a day exploring the Old Town. Gorgeous interior, delicious fresh food, and a genuinely warm welcome.":
+          "Чудова зупинка під час прогулянки Старим містом. Прекрасний інтер'єр, смачна свіжа їжа та щиро теплий прийом.",
+        "We came for lunch and stayed for dessert. The menu has something for everyone, and the ingredients really shine. Highly recommend.":
+          "Ми прийшли на обід і залишилися на десерт. У меню кожен знайде щось для себе, а якість продуктів відчувається в кожній страві. Рекомендую!",
+        "Bright, peaceful, and full of plants. The staff helped us pick a few dishes to share and every recommendation was spot on.":
+          "Світле, спокійне місце, сповнене рослин. Персонал допоміг обрати страви на компанію — кожна рекомендація була влучною.",
+        "Fresh, flavourful food in a charming setting. Great place to recharge after a walk through the old streets.":
+          "Свіжі, насичені смаки в чарівній атмосфері. Чудове місце, щоб перепочити після прогулянки старими вуличками.",
       };
       const preorderSelection = new Map();
       const cartItems = [];
@@ -5085,6 +5388,9 @@
         const priceUsd = Number.parseFloat(
           priceNode.textContent.replace(/[^\d.]/g, ""),
         );
+        card.dataset.dishNameEn = card
+          .querySelector(".dish-info h3")
+          .textContent.trim();
         if (Number.isFinite(priceUsd)) {
           card.dataset.priceUsd = String(priceUsd);
         }
@@ -5106,6 +5412,19 @@
 
       function applyLanguage() {
         document.documentElement.lang = currentLanguage === "uk" ? "uk" : "en";
+        const englishTitle = "Green & Tasty | Fresh food in Tbilisi";
+        document.title =
+          currentLanguage === "uk"
+            ? ukrainianTranslations[englishTitle]
+            : englishTitle;
+        const englishDescription =
+          "Green & Tasty brings fresh, locally sourced food and modern Georgian flavours to Tbilisi.";
+        document
+          .querySelector('meta[name="description"]')
+          ?.setAttribute(
+            "content",
+            translateText(englishDescription, currentLanguage),
+          );
         const walker = document.createTreeWalker(
           document.body,
           NodeFilter.SHOW_TEXT,
@@ -5113,28 +5432,142 @@
         let textNode;
         while ((textNode = walker.nextNode())) {
           if (
-            !textNode.parentElement?.closest("script, style, .dish-price")
+            !textNode.parentElement?.closest(
+              "script, style, .dish-price, .dish-dialog-price"
+            )
           ) {
             const original =
               originalTextNodes.get(textNode) ?? textNode.nodeValue;
             originalTextNodes.set(textNode, original);
-            const key = original.trim();
-            const translation = ukrainianTranslations[key];
-            const replacement =
-              currentLanguage === "uk" && translation ? translation : original;
+            const replacement = translateText(original, currentLanguage);
             if (replacement !== textNode.nodeValue) {
-              const leading = original.match(/^\s*/)?.[0] || "";
-              const trailing = original.match(/\s*$/)?.[0] || "";
-              textNode.nodeValue = `${leading}${replacement.trim()}${trailing}`;
+              textNode.nodeValue = replacement;
             }
           }
         }
+        document.querySelectorAll("*").forEach((element) => {
+          let attributes = originalAttributes.get(element);
+          if (!attributes) {
+            attributes = new Map();
+            originalAttributes.set(element, attributes);
+          }
+          translatableAttributes.forEach((attribute) => {
+            const current = element.getAttribute(attribute);
+            if (current === null) return;
+            const state = attributes.get(attribute);
+            const source =
+              state && current === state.translated ? state.source : current;
+            const translated = translateText(source, currentLanguage);
+            attributes.set(attribute, { source, translated });
+            if (current !== translated) {
+              element.setAttribute(attribute, translated);
+            }
+          });
+        });
+        document.querySelectorAll(".dish-weight").forEach((weight) => {
+          const englishWeight =
+            weight.dataset.weightEn || weight.textContent.trim();
+          weight.dataset.weightEn = englishWeight;
+          const translatedWeight = translateText(
+            englishWeight,
+            currentLanguage,
+          );
+          if (weight.textContent !== translatedWeight) {
+            weight.textContent = translatedWeight;
+          }
+        });
+        document
+          .querySelectorAll(".dish-dialog-price span[data-weight-en]")
+          .forEach((weight) => {
+            const translatedWeight = `/${translateText(
+              weight.dataset.weightEn,
+              currentLanguage,
+            )}`;
+            if (weight.textContent !== translatedWeight) {
+              weight.textContent = translatedWeight;
+            }
+          });
         languageButtons.forEach((button) => {
           button.setAttribute(
             "aria-pressed",
             String(button.dataset.language === currentLanguage),
           );
         });
+      }
+
+      const englishTranslationMap = new Map(
+        Object.entries(ukrainianTranslations).map(([english, ukrainian]) => [
+          ukrainian,
+          english,
+        ]),
+      );
+
+      function translateText(value, language) {
+        const leading = value.match(/^\s*/)?.[0] || "";
+        const trailing = value.match(/\s*$/)?.[0] || "";
+        const text = value.trim().replace(/\s+/g, " ");
+        if (language === "en") {
+          return `${leading}${englishTranslationMap.get(text) || text}${trailing}`;
+        }
+
+        let translated = ukrainianTranslations[text];
+        if (!translated) {
+          let match = text.match(/^(\d+) table(s)? available$/);
+          if (match) {
+            translated = `${match[1]} ${match[2] ? "столики доступні" : "столик доступний"}`;
+          }
+          match = text.match(/^(\d+) (guest|guests|person|people)$/);
+          if (match) {
+            translated = `${match[1]} ${Number(match[1]) === 1 ? "гість" : "гостей"}`;
+          }
+          match = text.match(/^(\d+) tables?$/);
+          if (match) translated = `${match[1]} столиків`;
+          match = text.match(/^Table (\d+)$/);
+          if (match) translated = `Столик ${match[1]}`;
+          match = text.match(/^Up to (\d+) guests$/);
+          if (match) translated = `До ${match[1]} гостей`;
+          match = text.match(/^Show all slots on (.+)$/);
+          if (match) translated = `Показати всі години на ${match[1]}`;
+          match = text.match(/^Calories: (.+)$/);
+          if (match) {
+            translated = `Калорійність: ${match[1].replace(/\bkcal\b/gi, "ккал")}`;
+          }
+          match = text.match(/^Please try again in (\d+) (minute|minutes)\.$/);
+          if (match) {
+            translated = `Спробуйте ще раз через ${match[1]} ${
+              Number(match[1]) === 1 ? "хвилину" : "хвилин"
+            }.`;
+          }
+          match = text.match(/^Shopping cart, (\d+) items?$/);
+          if (match) translated = `Кошик, ${match[1]} страв`;
+          match = text.match(/^Account: (.+)$/);
+          if (match) translated = `Акаунт: ${match[1]}`;
+          match = text.match(/^(\d+) × (.+)$/);
+          if (match) translated = `${match[1]} × ${match[2]}`;
+          match = text.match(/^Total: (.+)$/);
+          if (match) translated = `Разом: ${match[1]}`;
+          match = text.match(/^(\d+) tables? available$/);
+          if (match) translated = `${match[1]} столиків доступно`;
+          match = text.match(/^No tables match your selected date, time, and party size\.$/);
+          if (match) {
+            translated =
+              "На вибрані дату, час і кількість гостей вільних столиків немає.";
+          }
+          match = text.match(
+            /^Tables are available at (.+) at (\d{2}:\d{2})\.$/,
+          );
+          if (match) {
+            translated = `У цей час (${match[2]}) доступні столики: ${match[1]}.`;
+          }
+          match = text.match(
+            /^Available tables are shown on the right\. Select a time to continue\.$/,
+          );
+          if (match) {
+            translated =
+              "Праворуч показано вільні столики. Оберіть час, щоб продовжити.";
+          }
+        }
+        return `${leading}${translated || text}${trailing}`;
       }
 
       function setLanguage(language) {
@@ -5205,7 +5638,7 @@
         );
         if (!card) return null;
 
-        const name = card.querySelector(".dish-info h3").textContent.trim();
+        const name = card.dataset.dishNameEn;
         const price = Number(card.dataset.priceUsd);
         if (!Number.isFinite(price)) return null;
         const priceText = formatMoney(price);
@@ -5369,9 +5802,11 @@
         const index = Number(card.dataset.dishIndex);
         const details = dishDetails[index];
         const image = card.querySelector(".dish-image img");
-        const title = card.querySelector(".dish-info h3").textContent.trim();
+        const title = card.dataset.dishNameEn;
         const price = formatMoney(Number(card.dataset.priceUsd));
-        const weight = card.querySelector(".dish-weight").textContent.trim();
+        const weightElement = card.querySelector(".dish-weight");
+        const weight =
+          weightElement.dataset.weightEn || weightElement.textContent.trim();
         if (!details || !image) return;
 
         activeDishCard = card;
@@ -5382,11 +5817,12 @@
         dishDialogCalories.textContent = `Calories: ${details.calories}`;
         dishDialogMacros.textContent = details.macros;
         dishDialogVitamins.textContent = details.vitamins;
+        const weightLabel = document.createElement("span");
+        weightLabel.dataset.weightEn = weight;
+        weightLabel.textContent = `/${translateText(weight, currentLanguage)}`;
         dishDialogPrice.replaceChildren(
           document.createTextNode(price),
-          Object.assign(document.createElement("span"), {
-            textContent: `/${weight}`,
-          }),
+          weightLabel,
         );
         dishDialog.showModal();
         applyLanguage();
@@ -5899,7 +6335,7 @@
         });
         preorderConfirmationTotal.textContent = formatMoney(total);
         preorderDialog.close();
-        preorderSuccessDialog.showModal();
+        if (!preorderSuccessDialog.open) preorderSuccessDialog.showModal();
         applyLanguage();
       }
 
@@ -7637,6 +8073,23 @@
       }
       applyLanguage();
       setCurrency(currentCurrency);
+
+      let languageRefreshQueued = false;
+      const languageObserver = new MutationObserver(() => {
+        if (languageRefreshQueued) return;
+        languageRefreshQueued = true;
+        queueMicrotask(() => {
+          languageRefreshQueued = false;
+          applyLanguage();
+        });
+      });
+      languageObserver.observe(document.body, {
+        subtree: true,
+        childList: true,
+        characterData: true,
+        attributes: true,
+        attributeFilter: translatableAttributes,
+      });
 
       updateSignInForm();
       updateRegistrationForm();
